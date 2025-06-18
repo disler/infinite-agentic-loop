@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brutalist Command Dashboard - Architectural Brutalism Theme</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
+            color: #e0e0e0;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        main {
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            color: #fff;
+            text-shadow: 4px 4px 0px #000;
+            margin-bottom: 3rem;
+            border-left: 8px solid #ff6b1a;
+            padding-left: 2rem;
+            position: relative;
+        }
+
+        h1::before {
+            content: '';
+            position: absolute;
+            left: -12px;
+            top: -8px;
+            width: 4px;
+            height: calc(100% + 16px);
+            background: #666;
+            transform: skew(-15deg);
+        }
+
+        .dashboard-container {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            grid-template-rows: auto 1fr auto;
+            gap: 2rem;
+            height: 80vh;
+            position: relative;
+        }
+
+        .control-panel {
+            grid-row: 1 / -1;
+            background: linear-gradient(180deg, #3a3a3a 0%, #2a2a2a 100%);
+            border: 4px solid #000;
+            box-shadow: 
+                inset 0 0 0 2px #666,
+                8px 8px 0 rgba(0,0,0,0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .control-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, #ff6b1a 0%, #ff8c42 50%, #ff6b1a 100%);
+            z-index: 1;
+        }
+
+        .control-header {
+            padding: 2rem 1.5rem 1rem;
+            background: #000;
+            color: #ff6b1a;
+            font-weight: 900;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .control-section {
+            padding: 1.5rem;
+            border-bottom: 2px solid #000;
+            position: relative;
+        }
+
+        .control-section h3 {
+            font-size: 1rem;
+            color: #ff6b1a;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        .filter-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .filter-group label {
+            display: block;
+            color: #ccc;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .brutalist-select, .brutalist-input {
+            width: 100%;
+            padding: 0.8rem;
+            background: #1a1a1a;
+            border: 3px solid #000;
+            color: #fff;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            transition: all 0.1s ease;
+            position: relative;
+        }
+
+        .brutalist-select:focus, .brutalist-input:focus {
+            outline: none;
+            border-color: #ff6b1a;
+            box-shadow: 
+                0 0 0 3px rgba(255, 107, 26, 0.3),
+                inset 0 0 0 2px #ff6b1a;
+            transform: translateY(-2px);
+        }
+
+        .brutalist-button {
+            background: linear-gradient(135deg, #ff6b1a 0%, #ff8c42 100%);
+            border: 3px solid #000;
+            color: #000;
+            padding: 0.8rem 1.5rem;
+            font-family: 'Courier New', monospace;
+            font-weight: 900;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.1s ease;
+            position: relative;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+        }
+
+        .brutalist-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 0 #000;
+        }
+
+        .brutalist-button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 0 #000;
+        }
+
+        .brutalist-button.secondary {
+            background: linear-gradient(135deg, #666 0%, #888 100%);
+            color: #fff;
+        }
+
+        .auto-refresh {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .refresh-indicator {
+            width: 12px;
+            height: 12px;
+            background: #ff6b1a;
+            border: 2px solid #000;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .chart-container {
+            background: linear-gradient(135deg, #3a3a3a 0%, #2a2a2a 100%);
+            border: 4px solid #000;
+            box-shadow: 
+                inset 0 0 0 2px #666,
+                8px 8px 0 rgba(0,0,0,0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chart-header {
+            padding: 1.5rem;
+            background: #000;
+            color: #ff6b1a;
+            font-weight: 900;
+            font-size: 1.4rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chart-controls {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .chart-content {
+            padding: 2rem;
+            height: calc(100% - 80px);
+            position: relative;
+        }
+
+        .chart-canvas {
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(0deg, #1a1a1a 0px, transparent 1px),
+                linear-gradient(90deg, #1a1a1a 0px, transparent 1px);
+            background-size: 40px 40px;
+            position: relative;
+            border: 2px solid #333;
+        }
+
+        .chart-bars {
+            display: flex;
+            align-items: end;
+            height: 100%;
+            padding: 2rem;
+            gap: 1rem;
+        }
+
+        .chart-bar {
+            flex: 1;
+            background: linear-gradient(0deg, #ff6b1a 0%, #ff8c42 100%);
+            border: 2px solid #000;
+            position: relative;
+            transition: all 0.2s ease;
+            min-height: 20px;
+        }
+
+        .chart-bar:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 0 #000;
+        }
+
+        .chart-bar::after {
+            content: attr(data-value);
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #fff;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-shadow: 1px 1px 0 #000;
+        }
+
+        .chart-labels {
+            display: flex;
+            justify-content: space-between;
+            padding: 1rem 2rem 0;
+            color: #ccc;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .alerts-panel {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
+            border: 4px solid #000;
+            box-shadow: 
+                inset 0 0 0 2px #666,
+                8px 8px 0 rgba(0,0,0,0.5);
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .alerts-header {
+            padding: 1rem 1.5rem;
+            background: #000;
+            color: #ff6b1a;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .alert-item {
+            padding: 1rem 1.5rem;
+            border-bottom: 2px solid #333;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .alert-icon {
+            width: 16px;
+            height: 16px;
+            background: #ff6b1a;
+            border: 2px solid #000;
+            flex-shrink: 0;
+        }
+
+        .alert-content {
+            flex: 1;
+        }
+
+        .alert-time {
+            color: #999;
+            font-size: 0.8rem;
+        }
+
+        .alert-message {
+            color: #fff;
+            font-weight: 600;
+            margin-top: 0.2rem;
+        }
+
+        .export-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .export-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: #2a2a2a;
+            border: 3px solid #000;
+            box-shadow: 8px 8px 0 rgba(0,0,0,0.5);
+            min-width: 200px;
+            z-index: 1000;
+            display: none;
+        }
+
+        .export-menu.active {
+            display: block;
+            animation: dropDown 0.2s ease;
+        }
+
+        @keyframes dropDown {
+            from {
+                transform: translateY(-10px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .export-option {
+            padding: 1rem 1.5rem;
+            color: #fff;
+            cursor: pointer;
+            border-bottom: 1px solid #333;
+            text-transform: uppercase;
+            font-weight: 600;
+            transition: all 0.1s ease;
+        }
+
+        .export-option:hover {
+            background: #ff6b1a;
+            color: #000;
+            transform: translateX(4px);
+        }
+
+        .status-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #000;
+            border-top: 4px solid #ff6b1a;
+            padding: 0.5rem 2rem;
+            color: #fff;
+            font-size: 0.8rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #00ff00;
+            border: 1px solid #000;
+        }
+
+        .loading-bar {
+            width: 100%;
+            height: 4px;
+            background: #333;
+            position: relative;
+            overflow: hidden;
+            margin-top: 1rem;
+        }
+
+        .loading-progress {
+            height: 100%;
+            background: linear-gradient(90deg, #ff6b1a, #ff8c42);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        .metric-card {
+            background: #1a1a1a;
+            border: 2px solid #333;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: #ff6b1a;
+        }
+
+        .metric-value {
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: #ff6b1a;
+            text-shadow: 2px 2px 0 #000;
+        }
+
+        .metric-label {
+            color: #ccc;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            margin-top: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-container {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto 1fr auto;
+                height: auto;
+            }
+            
+            .control-panel {
+                grid-row: auto;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+                letter-spacing: 2px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <h1>Command Dashboard - Brutalist Architecture</h1>
+        
+        <div class="dashboard-container">
+            <!-- Control Panel -->
+            <div class="control-panel">
+                <div class="control-header">
+                    CONTROL SYSTEM
+                </div>
+                
+                <div class="control-section">
+                    <h3>Filters</h3>
+                    <div class="filter-group">
+                        <label>Time Period</label>
+                        <select class="brutalist-select" id="timePeriod">
+                            <option value="1h">Last Hour</option>
+                            <option value="24h" selected>Last 24 Hours</option>
+                            <option value="7d">Last 7 Days</option>
+                            <option value="30d">Last 30 Days</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Data Type</label>
+                        <select class="brutalist-select" id="dataType">
+                            <option value="all" selected>All Metrics</option>
+                            <option value="performance">Performance</option>
+                            <option value="errors">Error Rates</option>
+                            <option value="traffic">Traffic</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Threshold</label>
+                        <input type="range" class="brutalist-input" id="threshold" min="0" max="100" value="50">
+                        <span id="thresholdValue">50</span>
+                    </div>
+                    <button class="brutalist-button" onclick="applyFilters()">Apply Filters</button>
+                </div>
+
+                <div class="control-section">
+                    <h3>Export Data</h3>
+                    <div class="export-dropdown">
+                        <button class="brutalist-button secondary" onclick="toggleExportMenu()">Export Data</button>
+                        <div class="export-menu" id="exportMenu">
+                            <div class="export-option" onclick="exportData('csv')">Export as CSV</div>
+                            <div class="export-option" onclick="exportData('json')">Export as JSON</div>
+                            <div class="export-option" onclick="exportData('pdf')">Export as PDF</div>
+                            <div class="export-option" onclick="exportData('png')">Export Chart PNG</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="control-section">
+                    <h3>Auto Refresh</h3>
+                    <div class="auto-refresh">
+                        <button class="brutalist-button secondary" onclick="toggleAutoRefresh()" id="refreshBtn">
+                            Start Auto-Refresh
+                        </button>
+                        <div class="refresh-indicator" id="refreshIndicator" style="display: none;"></div>
+                    </div>
+                    <div class="filter-group">
+                        <label>Refresh Interval</label>
+                        <select class="brutalist-select" id="refreshInterval">
+                            <option value="5">5 seconds</option>
+                            <option value="10" selected>10 seconds</option>
+                            <option value="30">30 seconds</option>
+                            <option value="60">1 minute</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="control-section">
+                    <h3>System Metrics</h3>
+                    <div class="metric-card">
+                        <div class="metric-value" id="cpuUsage">67%</div>
+                        <div class="metric-label">CPU Usage</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="memoryUsage">42%</div>
+                        <div class="metric-label">Memory Usage</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="activeUsers">1,247</div>
+                        <div class="metric-label">Active Users</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chart Area -->
+            <div class="chart-container">
+                <div class="chart-header">
+                    <span>Performance Analytics</span>
+                    <div class="chart-controls">
+                        <button class="brutalist-button secondary" onclick="refreshChart()">Refresh</button>
+                        <button class="brutalist-button secondary" onclick="toggleChartType()">Switch View</button>
+                    </div>
+                </div>
+                <div class="chart-content">
+                    <div class="chart-canvas">
+                        <div class="chart-bars" id="chartBars">
+                            <!-- Chart bars will be dynamically generated -->
+                        </div>
+                    </div>
+                    <div class="chart-labels" id="chartLabels">
+                        <!-- Chart labels will be dynamically generated -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Alerts Panel -->
+            <div class="alerts-panel">
+                <div class="alerts-header">
+                    System Alerts & Notifications
+                </div>
+                <div id="alertsContainer">
+                    <!-- Alerts will be dynamically added -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div class="status-bar">
+        <div class="status-item">
+            <div class="status-dot"></div>
+            <span>System Online</span>
+        </div>
+        <div class="status-item">
+            <span>Last Update: <span id="lastUpdate">--:--:--</span></span>
+        </div>
+        <div class="status-item">
+            <span>Data Points: <span id="dataPoints">0</span></span>
+        </div>
+    </div>
+
+    <script>
+        // Global state management
+        let dashboardState = {
+            autoRefresh: false,
+            refreshInterval: 10,
+            currentData: [],
+            chartType: 'performance',
+            alerts: [],
+            refreshTimer: null
+        };
+
+        // Sample data for different metrics
+        const sampleData = {
+            performance: [
+                { label: 'API Response', value: 85, color: '#ff6b1a' },
+                { label: 'Database', value: 92, color: '#ff8c42' },
+                { label: 'Cache Hit', value: 78, color: '#ff6b1a' },
+                { label: 'Network', value: 88, color: '#ff8c42' },
+                { label: 'CPU Load', value: 65, color: '#ff6b1a' },
+                { label: 'Memory', value: 73, color: '#ff8c42' }
+            ],
+            errors: [
+                { label: '4xx Errors', value: 12, color: '#ff4444' },
+                { label: '5xx Errors', value: 8, color: '#ff6666' },
+                { label: 'Timeouts', value: 5, color: '#ff4444' },
+                { label: 'Failures', value: 3, color: '#ff6666' }
+            ],
+            traffic: [
+                { label: 'HTTP', value: 95, color: '#44ff44' },
+                { label: 'HTTPS', value: 87, color: '#66ff66' },
+                { label: 'WebSocket', value: 76, color: '#44ff44' },
+                { label: 'API Calls', value: 89, color: '#66ff66' }
+            ]
+        };
+
+        // Initialize dashboard
+        function initializeDashboard() {
+            generateChart();
+            updateMetrics();
+            generateInitialAlerts();
+            updateTimestamp();
+            
+            // Set up threshold slider
+            const thresholdSlider = document.getElementById('threshold');
+            const thresholdValue = document.getElementById('thresholdValue');
+            
+            thresholdSlider.addEventListener('input', function() {
+                thresholdValue.textContent = this.value;
+            });
+        }
+
+        // Generate chart visualization
+        function generateChart() {
+            const chartBars = document.getElementById('chartBars');
+            const chartLabels = document.getElementById('chartLabels');
+            const dataType = document.getElementById('dataType').value;
+            
+            let data = sampleData.performance;
+            if (dataType !== 'all') {
+                data = sampleData[dataType] || sampleData.performance;
+            }
+            
+            dashboardState.currentData = data;
+            
+            // Clear existing bars and labels
+            chartBars.innerHTML = '';
+            chartLabels.innerHTML = '';
+            
+            // Generate bars
+            data.forEach((item, index) => {
+                const bar = document.createElement('div');
+                bar.className = 'chart-bar';
+                bar.style.height = `${item.value}%`;
+                bar.style.background = `linear-gradient(0deg, ${item.color} 0%, ${item.color}aa 100%)`;
+                bar.setAttribute('data-value', item.value);
+                bar.addEventListener('click', () => showBarDetails(item));
+                chartBars.appendChild(bar);
+                
+                // Generate labels
+                const label = document.createElement('div');
+                label.textContent = item.label;
+                chartLabels.appendChild(label);
+            });
+            
+            // Update data points counter
+            document.getElementById('dataPoints').textContent = data.length;
+        }
+
+        // Apply filters and refresh chart
+        function applyFilters() {
+            const timePeriod = document.getElementById('timePeriod').value;
+            const threshold = document.getElementById('threshold').value;
+            
+            // Simulate filtering effect
+            const loadingBar = document.createElement('div');
+            loadingBar.className = 'loading-bar';
+            loadingBar.innerHTML = '<div class="loading-progress"></div>';
+            
+            const chartContent = document.querySelector('.chart-content');
+            chartContent.appendChild(loadingBar);
+            
+            // Animate loading
+            setTimeout(() => {
+                loadingBar.querySelector('.loading-progress').style.width = '100%';
+            }, 100);
+            
+            setTimeout(() => {
+                generateChart();
+                chartContent.removeChild(loadingBar);
+                addAlert('success', 'Filters applied successfully');
+            }, 1000);
+        }
+
+        // Toggle export menu
+        function toggleExportMenu() {
+            const menu = document.getElementById('exportMenu');
+            menu.classList.toggle('active');
+            
+            // Close menu when clicking outside
+            document.addEventListener('click', function closeMenu(e) {
+                if (!e.target.closest('.export-dropdown')) {
+                    menu.classList.remove('active');
+                    document.removeEventListener('click', closeMenu);
+                }
+            });
+        }
+
+        // Export data functionality
+        function exportData(format) {
+            const menu = document.getElementById('exportMenu');
+            menu.classList.remove('active');
+            
+            // Simulate export process
+            addAlert('info', `Exporting data as ${format.toUpperCase()}...`);
+            
+            setTimeout(() => {
+                // Create downloadable content
+                let content = '';
+                const data = dashboardState.currentData;
+                
+                switch(format) {
+                    case 'csv':
+                        content = 'Label,Value\n' + data.map(item => `${item.label},${item.value}`).join('\n');
+                        downloadFile(content, 'dashboard-data.csv', 'text/csv');
+                        break;
+                    case 'json':
+                        content = JSON.stringify(data, null, 2);
+                        downloadFile(content, 'dashboard-data.json', 'application/json');
+                        break;
+                    case 'pdf':
+                        addAlert('warning', 'PDF export feature coming soon');
+                        return;
+                    case 'png':
+                        addAlert('warning', 'PNG export feature coming soon');
+                        return;
+                }
+                
+                addAlert('success', `Data exported as ${format.toUpperCase()}`);
+            }, 1500);
+        }
+
+        // Download file helper
+        function downloadFile(content, filename, mimeType) {
+            const blob = new Blob([content], { type: mimeType });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // Toggle auto-refresh
+        function toggleAutoRefresh() {
+            const btn = document.getElementById('refreshBtn');
+            const indicator = document.getElementById('refreshIndicator');
+            
+            dashboardState.autoRefresh = !dashboardState.autoRefresh;
+            
+            if (dashboardState.autoRefresh) {
+                btn.textContent = 'Stop Auto-Refresh';
+                btn.style.background = 'linear-gradient(135deg, #ff4444 0%, #ff6666 100%)';
+                indicator.style.display = 'block';
+                startAutoRefresh();
+                addAlert('info', 'Auto-refresh activated');
+            } else {
+                btn.textContent = 'Start Auto-Refresh';
+                btn.style.background = 'linear-gradient(135deg, #666 0%, #888 100%)';
+                indicator.style.display = 'none';
+                stopAutoRefresh();
+                addAlert('info', 'Auto-refresh deactivated');
+            }
+        }
+
+        // Start auto-refresh timer
+        function startAutoRefresh() {
+            const interval = parseInt(document.getElementById('refreshInterval').value) * 1000;
+            
+            dashboardState.refreshTimer = setInterval(() => {
+                refreshChart();
+                updateMetrics();
+                updateTimestamp();
+            }, interval);
+        }
+
+        // Stop auto-refresh timer
+        function stopAutoRefresh() {
+            if (dashboardState.refreshTimer) {
+                clearInterval(dashboardState.refreshTimer);
+                dashboardState.refreshTimer = null;
+            }
+        }
+
+        // Refresh chart data
+        function refreshChart() {
+            // Simulate data update with slight variations
+            dashboardState.currentData = dashboardState.currentData.map(item => ({
+                ...item,
+                value: Math.max(10, Math.min(100, item.value + (Math.random() - 0.5) * 10))
+            }));
+            
+            // Update chart bars
+            const bars = document.querySelectorAll('.chart-bar');
+            bars.forEach((bar, index) => {
+                const newValue = Math.round(dashboardState.currentData[index].value);
+                bar.style.height = `${newValue}%`;
+                bar.setAttribute('data-value', newValue);
+            });
+            
+            updateTimestamp();
+            addAlert('info', 'Chart data refreshed');
+        }
+
+        // Toggle chart type
+        function toggleChartType() {
+            const types = ['performance', 'errors', 'traffic'];
+            const currentIndex = types.indexOf(dashboardState.chartType);
+            const nextIndex = (currentIndex + 1) % types.length;
+            dashboardState.chartType = types[nextIndex];
+            
+            document.getElementById('dataType').value = dashboardState.chartType;
+            generateChart();
+            addAlert('info', `Switched to ${dashboardState.chartType} view`);
+        }
+
+        // Update system metrics
+        function updateMetrics() {
+            document.getElementById('cpuUsage').textContent = Math.round(Math.random() * 30 + 50) + '%';
+            document.getElementById('memoryUsage').textContent = Math.round(Math.random() * 20 + 30) + '%';
+            document.getElementById('activeUsers').textContent = (Math.round(Math.random() * 500 + 1000)).toLocaleString();
+        }
+
+        // Add alert to the system
+        function addAlert(type, message) {
+            const alertsContainer = document.getElementById('alertsContainer');
+            const alert = document.createElement('div');
+            alert.className = 'alert-item';
+            
+            const now = new Date();
+            const timestamp = now.toLocaleTimeString();
+            
+            alert.innerHTML = `
+                <div class="alert-icon" style="background: ${type === 'success' ? '#00ff00' : type === 'warning' ? '#ffff00' : type === 'error' ? '#ff0000' : '#ff6b1a'}"></div>
+                <div class="alert-content">
+                    <div class="alert-time">${timestamp}</div>
+                    <div class="alert-message">${message}</div>
+                </div>
+            `;
+            
+            alertsContainer.insertBefore(alert, alertsContainer.firstChild);
+            
+            // Remove old alerts (keep only last 10)
+            const alerts = alertsContainer.querySelectorAll('.alert-item');
+            if (alerts.length > 10) {
+                alertsContainer.removeChild(alerts[alerts.length - 1]);
+            }
+        }
+
+        // Generate initial alerts
+        function generateInitialAlerts() {
+            const initialAlerts = [
+                { type: 'success', message: 'Dashboard system initialized successfully' },
+                { type: 'info', message: 'Data synchronization completed' },
+                { type: 'warning', message: 'High memory usage detected on server-03' },
+                { type: 'info', message: 'Backup process completed' }
+            ];
+            
+            initialAlerts.forEach((alert, index) => {
+                setTimeout(() => {
+                    addAlert(alert.type, alert.message);
+                }, index * 500);
+            });
+        }
+
+        // Update timestamp
+        function updateTimestamp() {
+            const now = new Date();
+            document.getElementById('lastUpdate').textContent = now.toLocaleTimeString();
+        }
+
+        // Show bar details on click
+        function showBarDetails(item) {
+            addAlert('info', `${item.label}: ${item.value}% - Click to drill down`);
+        }
+
+        // Initialize dashboard when page loads
+        document.addEventListener('DOMContentLoaded', initializeDashboard);
+
+        // Handle window focus/blur for auto-refresh
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden && dashboardState.autoRefresh) {
+                stopAutoRefresh();
+            } else if (!document.hidden && dashboardState.autoRefresh) {
+                startAutoRefresh();
+            }
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey || e.metaKey) {
+                switch(e.key) {
+                    case 'r':
+                        e.preventDefault();
+                        refreshChart();
+                        break;
+                    case 'e':
+                        e.preventDefault();
+                        toggleExportMenu();
+                        break;
+                    case 'f':
+                        e.preventDefault();
+                        applyFilters();
+                        break;
+                }
+            }
+        });
+    </script>
+</body>
+</html>

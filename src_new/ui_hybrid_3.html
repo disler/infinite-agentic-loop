@@ -1,0 +1,1186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Garden File Manager - Organic Nature Theme</title>
+    <style>
+        :root {
+            --forest-dark: #1a4c3a;
+            --forest-medium: #2d7055;
+            --forest-light: #4a9c6d;
+            --bark-brown: #3c2b1f;
+            --leaf-green: #7fb069;
+            --autumn-gold: #e4c441;
+            --soil-brown: #5d4e37;
+            --moss-green: #8fbc8f;
+            --flower-pink: #ff7b9a;
+            --sky-blue: #87ceeb;
+            --morning-mist: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, var(--forest-dark) 0%, var(--soil-brown) 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--leaf-green);
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                radial-gradient(circle at 20% 20%, var(--moss-green) 1px, transparent 1px),
+                radial-gradient(circle at 80% 80%, var(--leaf-green) 1px, transparent 1px);
+            background-size: 30px 30px, 50px 50px;
+            opacity: 0.1;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--autumn-gold);
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            text-shadow: 2px 2px 4px var(--bark-brown);
+            position: relative;
+        }
+
+        h1::before, h1::after {
+            content: '🌿';
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.5rem;
+            animation: sway 3s ease-in-out infinite;
+        }
+
+        h1::before {
+            left: -60px;
+            animation-delay: -0.5s;
+        }
+
+        h1::after {
+            right: -60px;
+            animation-delay: -1s;
+        }
+
+        .garden-container {
+            background: linear-gradient(145deg, 
+                var(--forest-medium) 0%, 
+                var(--forest-light) 50%, 
+                var(--forest-medium) 100%);
+            border-radius: 30px;
+            padding: 30px;
+            box-shadow: 
+                inset 0 4px 15px var(--morning-mist),
+                0 15px 35px rgba(0, 0, 0, 0.3),
+                0 5px 15px rgba(0, 0, 0, 0.2);
+            border: 3px solid var(--bark-brown);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .garden-container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: 
+                radial-gradient(circle at 30% 30%, var(--leaf-green) 2px, transparent 2px),
+                radial-gradient(circle at 70% 70%, var(--moss-green) 1px, transparent 1px);
+            background-size: 40px 40px, 25px 25px;
+            opacity: 0.1;
+            animation: drift 20s linear infinite;
+            pointer-events: none;
+        }
+
+        .vine-border {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            bottom: 10px;
+            border: 2px solid var(--leaf-green);
+            border-radius: 25px;
+            background: linear-gradient(45deg, 
+                transparent 49%, 
+                var(--leaf-green) 50%, 
+                transparent 51%);
+            background-size: 8px 8px;
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        .upload-garden {
+            background: linear-gradient(135deg, 
+                var(--moss-green) 0%, 
+                var(--leaf-green) 100%);
+            border: 3px dashed var(--autumn-gold);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            overflow: hidden;
+        }
+
+        .upload-garden::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, var(--autumn-gold) 1px, transparent 1px);
+            background-size: 20px 20px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .upload-garden.drag-over {
+            border-color: var(--flower-pink);
+            background: linear-gradient(135deg, 
+                var(--leaf-green) 0%, 
+                var(--moss-green) 100%);
+            transform: scale(1.02);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .upload-garden.drag-over::before {
+            opacity: 0.1;
+            animation: sparkle 1s ease-in-out infinite;
+        }
+
+        .upload-icon {
+            font-size: 4rem;
+            color: var(--autumn-gold);
+            margin-bottom: 20px;
+            display: block;
+            animation: float 2s ease-in-out infinite;
+        }
+
+        .upload-text {
+            font-size: 1.3rem;
+            color: var(--forest-dark);
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .upload-subtext {
+            color: var(--bark-brown);
+            font-size: 1rem;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .progress-grove {
+            margin-bottom: 30px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-in-out;
+        }
+
+        .progress-grove.active {
+            max-height: 300px;
+        }
+
+        .progress-item {
+            background: linear-gradient(90deg, 
+                var(--bark-brown) 0%, 
+                var(--soil-brown) 100%);
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 15px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .progress-filename {
+            color: var(--leaf-green);
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .progress-status {
+            color: var(--autumn-gold);
+            font-size: 0.9rem;
+        }
+
+        .progress-bar-container {
+            height: 8px;
+            background: var(--forest-dark);
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, 
+                var(--leaf-green) 0%, 
+                var(--autumn-gold) 50%, 
+                var(--leaf-green) 100%);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+            position: relative;
+        }
+
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, 
+                transparent, 
+                rgba(255, 255, 255, 0.4), 
+                transparent);
+            animation: shimmer 1.5s infinite;
+        }
+
+        .file-forest {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .file-browser {
+            background: linear-gradient(135deg, 
+                var(--forest-medium) 0%, 
+                var(--bark-brown) 100%);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .browser-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--leaf-green);
+        }
+
+        .browser-title {
+            color: var(--autumn-gold);
+            font-size: 1.4rem;
+            font-weight: bold;
+        }
+
+        .view-toggle {
+            display: flex;
+            gap: 10px;
+        }
+
+        .view-btn {
+            background: var(--leaf-green);
+            color: var(--forest-dark);
+            border: none;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .view-btn:hover {
+            background: var(--autumn-gold);
+            transform: translateY(-2px);
+        }
+
+        .view-btn.active {
+            background: var(--autumn-gold);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .file-list {
+            max-height: 400px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: var(--leaf-green) var(--forest-dark);
+        }
+
+        .file-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            margin-bottom: 8px;
+            background: linear-gradient(90deg, 
+                var(--soil-brown) 0%, 
+                var(--bark-brown) 100%);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+
+        .file-item:hover {
+            background: linear-gradient(90deg, 
+                var(--bark-brown) 0%, 
+                var(--soil-brown) 100%);
+            border-left-color: var(--leaf-green);
+            transform: translateX(5px);
+        }
+
+        .file-item.selected {
+            border-left-color: var(--autumn-gold);
+            background: linear-gradient(90deg, 
+                var(--leaf-green) 0%, 
+                var(--moss-green) 100%);
+            color: var(--forest-dark);
+        }
+
+        .file-icon {
+            font-size: 1.5rem;
+            margin-right: 15px;
+            width: 30px;
+            text-align: center;
+        }
+
+        .file-details {
+            flex: 1;
+        }
+
+        .file-name {
+            font-weight: bold;
+            margin-bottom: 2px;
+        }
+
+        .file-meta {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+
+        .file-actions {
+            display: flex;
+            gap: 8px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .file-item:hover .file-actions {
+            opacity: 1;
+        }
+
+        .action-btn {
+            background: var(--leaf-green);
+            color: var(--forest-dark);
+            border: none;
+            padding: 4px 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.2s ease;
+        }
+
+        .action-btn:hover {
+            background: var(--autumn-gold);
+            transform: scale(1.1);
+        }
+
+        .preview-garden {
+            background: linear-gradient(135deg, 
+                var(--moss-green) 0%, 
+                var(--leaf-green) 100%);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+
+        .preview-header {
+            color: var(--forest-dark);
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .preview-content {
+            background: var(--forest-dark);
+            border-radius: 10px;
+            padding: 20px;
+            min-height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--leaf-green);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .preview-placeholder {
+            text-align: center;
+            opacity: 0.6;
+        }
+
+        .preview-image {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .preview-text {
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .validation-garden {
+            background: linear-gradient(135deg, 
+                var(--forest-light) 0%, 
+                var(--moss-green) 100%);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .validation-title {
+            color: var(--forest-dark);
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .file-types {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+        }
+
+        .file-type {
+            background: var(--forest-dark);
+            color: var(--leaf-green);
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .file-type:hover {
+            border-color: var(--autumn-gold);
+            background: var(--bark-brown);
+            transform: translateY(-2px);
+        }
+
+        .file-type.valid {
+            border-color: var(--leaf-green);
+            background: var(--soil-brown);
+        }
+
+        .file-type.invalid {
+            border-color: var(--flower-pink);
+            background: var(--bark-brown);
+            opacity: 0.6;
+        }
+
+        .seasonal-effects {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .falling-leaf {
+            position: absolute;
+            color: var(--autumn-gold);
+            font-size: 1.2rem;
+            animation: fall 8s linear infinite;
+            opacity: 0.6;
+        }
+
+        .growing-vine {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            color: var(--leaf-green);
+            font-size: 2rem;
+            animation: grow 4s ease-out infinite;
+        }
+
+        @keyframes sway {
+            0%, 100% { transform: translateY(-50%) rotate(-5deg); }
+            50% { transform: translateY(-50%) rotate(5deg); }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes drift {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            100% { transform: translate(-100px, -100px) rotate(360deg); }
+        }
+
+        @keyframes sparkle {
+            0%, 100% { opacity: 0.1; }
+            50% { opacity: 0.3; }
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        @keyframes fall {
+            0% { 
+                top: -50px; 
+                left: 10%;
+                transform: rotate(0deg);
+            }
+            100% { 
+                top: 100vh; 
+                left: 20%;
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes grow {
+            0% { 
+                height: 0;
+                opacity: 0;
+            }
+            50% {
+                opacity: 1;
+            }
+            100% { 
+                height: 60px;
+                opacity: 0;
+            }
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, var(--leaf-green), var(--moss-green));
+            color: var(--forest-dark);
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+            border-left: 4px solid var(--autumn-gold);
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.error {
+            background: linear-gradient(135deg, var(--flower-pink), var(--autumn-gold));
+        }
+
+        @media (max-width: 768px) {
+            .file-forest {
+                grid-template-columns: 1fr;
+            }
+            
+            .file-types {
+                grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            h1::before, h1::after {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <h1>Digital Garden File Manager - Organic Nature Theme</h1>
+        
+        <div class="garden-container">
+            <div class="vine-border"></div>
+            
+            <!-- Upload Area -->
+            <div class="upload-garden" id="uploadArea">
+                <span class="upload-icon">🌱</span>
+                <div class="upload-text">Plant your files in the digital garden</div>
+                <div class="upload-subtext">Drag & drop files here or click to browse • Max 10MB per file</div>
+                <input type="file" id="fileInput" class="file-input" multiple accept="image/*,text/*,.pdf,.doc,.docx">
+            </div>
+
+            <!-- Progress Tracking -->
+            <div class="progress-grove" id="progressGrove">
+                <!-- Progress items will be dynamically added here -->
+            </div>
+
+            <!-- File Browser and Preview -->
+            <div class="file-forest">
+                <div class="file-browser">
+                    <div class="browser-header">
+                        <h3 class="browser-title">🌳 File Forest</h3>
+                        <div class="view-toggle">
+                            <button class="view-btn active" data-view="list">List</button>
+                            <button class="view-btn" data-view="grid">Grid</button>
+                        </div>
+                    </div>
+                    <div class="file-list" id="fileList">
+                        <!-- Files will be dynamically added here -->
+                    </div>
+                </div>
+
+                <div class="preview-garden">
+                    <h3 class="preview-header">🍃 File Preview</h3>
+                    <div class="preview-content" id="previewContent">
+                        <div class="preview-placeholder">
+                            <div style="font-size: 3rem; margin-bottom: 10px;">🌿</div>
+                            <div>Select a file to preview its contents</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- File Type Validation -->
+            <div class="validation-garden">
+                <h3 class="validation-title">🌺 Supported File Types</h3>
+                <div class="file-types" id="fileTypes">
+                    <div class="file-type valid" data-type="image">📸 Images</div>
+                    <div class="file-type valid" data-type="text">📄 Text</div>
+                    <div class="file-type valid" data-type="pdf">📋 PDF</div>
+                    <div class="file-type valid" data-type="document">📝 Documents</div>
+                    <div class="file-type invalid" data-type="video">🎬 Video</div>
+                    <div class="file-type invalid" data-type="audio">🎵 Audio</div>
+                </div>
+            </div>
+
+            <!-- Seasonal Effects -->
+            <div class="seasonal-effects" id="seasonalEffects">
+                <div class="growing-vine">🌿</div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Notification -->
+    <div class="notification" id="notification"></div>
+
+    <script>
+        class DigitalGardenFileManager {
+            constructor() {
+                this.files = this.generateSampleFiles();
+                this.selectedFile = null;
+                this.uploadQueue = [];
+                this.supportedTypes = {
+                    image: ['image/jpeg', 'image/png', 'image/gif', 'image/webp'],
+                    text: ['text/plain', 'text/html', 'text/css', 'text/javascript'],
+                    pdf: ['application/pdf'],
+                    document: ['application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document']
+                };
+                
+                this.init();
+            }
+
+            init() {
+                this.setupEventListeners();
+                this.renderFileList();
+                this.startSeasonalEffects();
+                this.showWelcomeNotification();
+            }
+
+            generateSampleFiles() {
+                return [
+                    {
+                        id: 1,
+                        name: 'spring_garden.jpg',
+                        type: 'image/jpeg',
+                        size: 2547896,
+                        lastModified: new Date('2024-03-15'),
+                        content: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjE1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjE1MCIgZmlsbD0iIzRhOWM2ZCIvPjx0ZXh0IHg9IjEwMCIgeT0iNzUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iI2ZmZiIgdGV4dC1hbmNob3I9Im1pZGRsZSI+U3ByaW5nIEdhcmRlbjwvdGV4dD48L3N2Zz4='
+                    },
+                    {
+                        id: 2,
+                        name: 'plant_care_guide.txt',
+                        type: 'text/plain',
+                        size: 3456,
+                        lastModified: new Date('2024-02-28'),
+                        content: 'Digital Garden Plant Care Guide\n\n1. Water your files regularly with updates\n2. Prune unnecessary data to keep them healthy\n3. Provide adequate storage space for growth\n4. Back up regularly to prevent data wilting\n5. Organize files in folders like garden beds\n\nRemember: A well-tended digital garden yields the best results!'
+                    },
+                    {
+                        id: 3,
+                        name: 'forest_analytics.pdf',
+                        type: 'application/pdf',
+                        size: 1234567,
+                        lastModified: new Date('2024-01-20'),
+                        content: 'PDF Document: Forest Analytics Report\n\nThis document contains comprehensive analysis of digital forest growth patterns, file ecosystem health metrics, and recommendations for sustainable data management practices.'
+                    },
+                    {
+                        id: 4,
+                        name: 'seasonal_notes.docx',
+                        type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                        size: 867432,
+                        lastModified: new Date('2024-03-10'),
+                        content: 'Document: Seasonal Notes\n\nSpring: Time for new projects and fresh starts\nSummer: Peak productivity and growth phase\nAutumn: Harvest results and prepare for changes\nWinter: Reflection, planning, and preparation\n\nEach season brings unique opportunities for digital growth.'
+                    },
+                    {
+                        id: 5,
+                        name: 'nature_sounds.mp3',
+                        type: 'audio/mpeg',
+                        size: 5432109,
+                        lastModified: new Date('2024-02-15'),
+                        content: 'Audio file not supported in preview'
+                    }
+                ];
+            }
+
+            setupEventListeners() {
+                const uploadArea = document.getElementById('uploadArea');
+                const fileInput = document.getElementById('fileInput');
+                
+                // Upload area events
+                uploadArea.addEventListener('click', () => fileInput.click());
+                uploadArea.addEventListener('dragover', this.handleDragOver.bind(this));
+                uploadArea.addEventListener('dragleave', this.handleDragLeave.bind(this));
+                uploadArea.addEventListener('drop', this.handleDrop.bind(this));
+                
+                // File input change
+                fileInput.addEventListener('change', this.handleFileSelect.bind(this));
+                
+                // View toggle
+                document.querySelectorAll('.view-btn').forEach(btn => {
+                    btn.addEventListener('click', this.toggleView.bind(this));
+                });
+                
+                // File type validation display
+                document.querySelectorAll('.file-type').forEach(type => {
+                    type.addEventListener('click', this.highlightFileType.bind(this));
+                });
+            }
+
+            handleDragOver(e) {
+                e.preventDefault();
+                e.currentTarget.classList.add('drag-over');
+            }
+
+            handleDragLeave(e) {
+                e.currentTarget.classList.remove('drag-over');
+            }
+
+            handleDrop(e) {
+                e.preventDefault();
+                e.currentTarget.classList.remove('drag-over');
+                const files = Array.from(e.dataTransfer.files);
+                this.processFiles(files);
+            }
+
+            handleFileSelect(e) {
+                const files = Array.from(e.target.files);
+                this.processFiles(files);
+            }
+
+            processFiles(files) {
+                files.forEach(file => {
+                    if (this.validateFile(file)) {
+                        this.uploadFile(file);
+                    } else {
+                        this.showNotification(`${file.name} is not a supported file type`, 'error');
+                    }
+                });
+            }
+
+            validateFile(file) {
+                const maxSize = 10 * 1024 * 1024; // 10MB
+                
+                if (file.size > maxSize) {
+                    this.showNotification(`${file.name} is too large (max 10MB)`, 'error');
+                    return false;
+                }
+                
+                const isSupported = Object.values(this.supportedTypes)
+                    .flat()
+                    .includes(file.type);
+                
+                return isSupported;
+            }
+
+            uploadFile(file) {
+                const uploadId = Date.now() + Math.random();
+                const progressGrove = document.getElementById('progressGrove');
+                
+                // Show progress area
+                progressGrove.classList.add('active');
+                
+                // Create progress item
+                const progressItem = document.createElement('div');
+                progressItem.className = 'progress-item';
+                progressItem.innerHTML = `
+                    <div class="progress-header">
+                        <span class="progress-filename">🌱 ${file.name}</span>
+                        <span class="progress-status">Planting...</span>
+                    </div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" style="width: 0%"></div>
+                    </div>
+                `;
+                
+                progressGrove.appendChild(progressItem);
+                
+                // Simulate upload progress
+                this.simulateUpload(uploadId, file, progressItem);
+            }
+
+            simulateUpload(uploadId, file, progressItem) {
+                let progress = 0;
+                const progressBar = progressItem.querySelector('.progress-bar');
+                const statusSpan = progressItem.querySelector('.progress-status');
+                
+                const interval = setInterval(() => {
+                    progress += Math.random() * 15;
+                    
+                    if (progress >= 100) {
+                        progress = 100;
+                        clearInterval(interval);
+                        
+                        // Complete upload
+                        statusSpan.textContent = 'Bloomed! 🌸';
+                        statusSpan.style.color = 'var(--autumn-gold)';
+                        
+                        // Add to file list
+                        const newFile = {
+                            id: Date.now(),
+                            name: file.name,
+                            type: file.type,
+                            size: file.size,
+                            lastModified: new Date(),
+                            content: 'Newly uploaded file content'
+                        };
+                        
+                        this.files.unshift(newFile);
+                        this.renderFileList();
+                        this.showNotification(`${file.name} successfully planted in your garden!`);
+                        
+                        // Remove progress item after delay
+                        setTimeout(() => {
+                            progressItem.remove();
+                            if (document.getElementById('progressGrove').children.length === 0) {
+                                document.getElementById('progressGrove').classList.remove('active');
+                            }
+                        }, 2000);
+                    }
+                    
+                    progressBar.style.width = `${progress}%`;
+                    
+                    if (progress < 30) {
+                        statusSpan.textContent = 'Sprouting...';
+                    } else if (progress < 70) {
+                        statusSpan.textContent = 'Growing...';
+                    } else if (progress < 100) {
+                        statusSpan.textContent = 'Flowering...';
+                    }
+                }, 100 + Math.random() * 200);
+            }
+
+            renderFileList() {
+                const fileList = document.getElementById('fileList');
+                fileList.innerHTML = '';
+                
+                this.files.forEach(file => {
+                    const fileItem = document.createElement('div');
+                    fileItem.className = 'file-item';
+                    fileItem.dataset.fileId = file.id;
+                    
+                    const icon = this.getFileIcon(file.type);
+                    const size = this.formatFileSize(file.size);
+                    const date = file.lastModified.toLocaleDateString();
+                    const isSupported = this.isFileSupported(file.type);
+                    
+                    fileItem.innerHTML = `
+                        <span class="file-icon">${icon}</span>
+                        <div class="file-details">
+                            <div class="file-name">${file.name}</div>
+                            <div class="file-meta">${size} • ${date}</div>
+                        </div>
+                        <div class="file-actions">
+                            ${isSupported ? '<button class="action-btn" onclick="fileManager.previewFile(' + file.id + ')">Preview</button>' : ''}
+                            <button class="action-btn" onclick="fileManager.downloadFile(' + file.id + ')">Download</button>
+                            <button class="action-btn" onclick="fileManager.deleteFile(' + file.id + ')">Delete</button>
+                        </div>
+                    `;
+                    
+                    fileItem.addEventListener('click', () => this.selectFile(file));
+                    
+                    if (!isSupported) {
+                        fileItem.style.opacity = '0.6';
+                        fileItem.title = 'File type not supported for preview';
+                    }
+                    
+                    fileList.appendChild(fileItem);
+                });
+            }
+
+            getFileIcon(type) {
+                if (type.startsWith('image/')) return '🖼️';
+                if (type.startsWith('text/')) return '📄';
+                if (type === 'application/pdf') return '📋';
+                if (type.includes('document')) return '📝';
+                if (type.startsWith('audio/')) return '🎵';
+                if (type.startsWith('video/')) return '🎬';
+                return '📁';
+            }
+
+            formatFileSize(bytes) {
+                if (bytes === 0) return '0 Bytes';
+                const k = 1024;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            }
+
+            isFileSupported(type) {
+                return Object.values(this.supportedTypes).flat().includes(type);
+            }
+
+            selectFile(file) {
+                // Remove previous selection
+                document.querySelectorAll('.file-item').forEach(item => {
+                    item.classList.remove('selected');
+                });
+                
+                // Add selection to current file
+                document.querySelector(`[data-file-id="${file.id}"]`).classList.add('selected');
+                
+                this.selectedFile = file;
+                this.previewFile(file.id);
+            }
+
+            previewFile(fileId) {
+                const file = this.files.find(f => f.id === fileId);
+                if (!file) return;
+                
+                const previewContent = document.getElementById('previewContent');
+                
+                if (!this.isFileSupported(file.type)) {
+                    previewContent.innerHTML = `
+                        <div class="preview-placeholder">
+                            <div style="font-size: 3rem; margin-bottom: 10px;">🚫</div>
+                            <div>File type not supported for preview</div>
+                            <div style="margin-top: 10px; font-size: 0.9rem; opacity: 0.7;">${file.name}</div>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                if (file.type.startsWith('image/')) {
+                    previewContent.innerHTML = `
+                        <img src="${file.content}" alt="${file.name}" class="preview-image">
+                    `;
+                } else {
+                    previewContent.innerHTML = `
+                        <div class="preview-text">${file.content}</div>
+                    `;
+                }
+                
+                // Add growth animation to preview
+                previewContent.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    previewContent.style.transform = 'scale(1)';
+                }, 100);
+            }
+
+            downloadFile(fileId) {
+                const file = this.files.find(f => f.id === fileId);
+                if (!file) return;
+                
+                this.showNotification(`Harvesting ${file.name}... 🌾`);
+                
+                // Simulate download
+                setTimeout(() => {
+                    this.showNotification(`${file.name} successfully harvested!`);
+                }, 1000);
+            }
+
+            deleteFile(fileId) {
+                const file = this.files.find(f => f.id === fileId);
+                if (!file) return;
+                
+                if (confirm(`Compost ${file.name}? This action cannot be undone.`)) {
+                    this.files = this.files.filter(f => f.id !== fileId);
+                    this.renderFileList();
+                    
+                    if (this.selectedFile && this.selectedFile.id === fileId) {
+                        document.getElementById('previewContent').innerHTML = `
+                            <div class="preview-placeholder">
+                                <div style="font-size: 3rem; margin-bottom: 10px;">🌿</div>
+                                <div>Select a file to preview its contents</div>
+                            </div>
+                        `;
+                        this.selectedFile = null;
+                    }
+                    
+                    this.showNotification(`${file.name} composted successfully 🍂`);
+                }
+            }
+
+            toggleView(e) {
+                document.querySelectorAll('.view-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                e.target.classList.add('active');
+                
+                const view = e.target.dataset.view;
+                const fileList = document.getElementById('fileList');
+                
+                if (view === 'grid') {
+                    fileList.style.display = 'grid';
+                    fileList.style.gridTemplateColumns = 'repeat(auto-fill, minmax(200px, 1fr))';
+                    fileList.style.gap = '15px';
+                } else {
+                    fileList.style.display = 'block';
+                    fileList.style.gridTemplateColumns = 'none';
+                    fileList.style.gap = 'initial';
+                }
+            }
+
+            highlightFileType(e) {
+                const type = e.target.dataset.type;
+                const isValid = e.target.classList.contains('valid');
+                
+                if (isValid) {
+                    this.showNotification(`${type} files are supported! 🌟`);
+                } else {
+                    this.showNotification(`${type} files are not supported in this garden 🚫`, 'error');
+                }
+                
+                // Highlight matching files
+                document.querySelectorAll('.file-item').forEach(item => {
+                    const fileId = parseInt(item.dataset.fileId);
+                    const file = this.files.find(f => f.id === fileId);
+                    
+                    if (file && this.getFileCategory(file.type) === type) {
+                        item.style.border = `2px solid ${isValid ? 'var(--leaf-green)' : 'var(--flower-pink)'}`;
+                        setTimeout(() => {
+                            item.style.border = 'none';
+                        }, 2000);
+                    }
+                });
+            }
+
+            getFileCategory(type) {
+                if (type.startsWith('image/')) return 'image';
+                if (type.startsWith('text/')) return 'text';
+                if (type === 'application/pdf') return 'pdf';
+                if (type.includes('document')) return 'document';
+                if (type.startsWith('audio/')) return 'audio';
+                if (type.startsWith('video/')) return 'video';
+                return 'other';
+            }
+
+            startSeasonalEffects() {
+                // Add falling leaves effect
+                setInterval(() => {
+                    this.createFallingLeaf();
+                }, 3000);
+                
+                // Add growing vines effect
+                setInterval(() => {
+                    this.createGrowingVine();
+                }, 5000);
+            }
+
+            createFallingLeaf() {
+                const effects = document.getElementById('seasonalEffects');
+                const leaf = document.createElement('div');
+                leaf.className = 'falling-leaf';
+                leaf.textContent = ['🍂', '🍃', '🌿'][Math.floor(Math.random() * 3)];
+                leaf.style.left = Math.random() * 100 + '%';
+                leaf.style.animationDuration = (5 + Math.random() * 5) + 's';
+                
+                effects.appendChild(leaf);
+                
+                setTimeout(() => {
+                    leaf.remove();
+                }, 10000);
+            }
+
+            createGrowingVine() {
+                const effects = document.getElementById('seasonalEffects');
+                const vine = document.createElement('div');
+                vine.className = 'growing-vine';
+                vine.textContent = '🌱';
+                vine.style.left = Math.random() * 100 + '%';
+                
+                effects.appendChild(vine);
+                
+                setTimeout(() => {
+                    vine.remove();
+                }, 4000);
+            }
+
+            showNotification(message, type = 'success') {
+                const notification = document.getElementById('notification');
+                notification.textContent = message;
+                notification.className = `notification ${type}`;
+                notification.classList.add('show');
+                
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 3000);
+            }
+
+            showWelcomeNotification() {
+                setTimeout(() => {
+                    this.showNotification('Welcome to your Digital Garden! 🌱 Plant some files to get started.');
+                }, 1000);
+            }
+        }
+
+        // Initialize the file manager
+        const fileManager = new DigitalGardenFileManager();
+    </script>
+</body>
+</html>

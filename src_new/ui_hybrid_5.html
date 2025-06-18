@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glass Morphism Form Wizard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        main {
+            width: 100%;
+            max-width: 900px;
+        }
+
+        h1 {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 2.5rem;
+            font-weight: 300;
+            margin-bottom: 2rem;
+            text-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            letter-spacing: -0.5px;
+        }
+
+        .hybrid-component {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hybrid-component::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+        }
+
+        /* Progress Indicator */
+        .progress-section {
+            margin-bottom: 40px;
+        }
+
+        .progress-steps {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .progress-line {
+            position: absolute;
+            top: 20px;
+            left: 10%;
+            right: 10%;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 1px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #a8edea, #fed6e3);
+            border-radius: 1px;
+            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 10px rgba(168, 237, 234, 0.5);
+        }
+
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 2;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .step-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .step.active .step-circle {
+            background: rgba(168, 237, 234, 0.3);
+            border-color: rgba(168, 237, 234, 0.8);
+            color: white;
+            box-shadow: 0 0 20px rgba(168, 237, 234, 0.4);
+            transform: scale(1.1);
+        }
+
+        .step.completed .step-circle {
+            background: rgba(254, 214, 227, 0.3);
+            border-color: rgba(254, 214, 227, 0.8);
+            color: white;
+        }
+
+        .step-label {
+            margin-top: 8px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 500;
+            text-align: center;
+            transition: color 0.3s ease;
+        }
+
+        .step.active .step-label {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        /* Form Container */
+        .form-container {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 32px;
+            margin-bottom: 24px;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            position: relative;
+            min-height: 400px;
+        }
+
+        .form-step {
+            display: none;
+            animation: fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .form-step.active {
+            display: block;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .step-title {
+            font-size: 1.5rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 8px;
+            font-weight: 300;
+        }
+
+        .step-subtitle {
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 32px;
+            font-size: 14px;
+        }
+
+        /* Form Fields */
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 16px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        label {
+            display: block;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 16px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 16px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: rgba(168, 237, 234, 0.6);
+            box-shadow: 
+                inset 0 1px 2px rgba(0, 0, 0, 0.1),
+                0 0 0 3px rgba(168, 237, 234, 0.2);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        input::placeholder, textarea::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Validation */
+        .error {
+            border-color: rgba(255, 107, 107, 0.6) !important;
+            box-shadow: 
+                inset 0 1px 2px rgba(0, 0, 0, 0.1),
+                0 0 0 3px rgba(255, 107, 107, 0.2) !important;
+        }
+
+        .error-message {
+            color: rgba(255, 107, 107, 0.9);
+            font-size: 12px;
+            margin-top: 4px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .success {
+            border-color: rgba(107, 255, 107, 0.6) !important;
+            box-shadow: 
+                inset 0 1px 2px rgba(0, 0, 0, 0.1),
+                0 0 0 3px rgba(107, 255, 107, 0.2) !important;
+        }
+
+        /* Auto-save indicator */
+        .auto-save {
+            position: absolute;
+            top: 16px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 12px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .auto-save.saving {
+            opacity: 1;
+            color: rgba(254, 214, 227, 0.8);
+        }
+
+        .auto-save.saved {
+            opacity: 1;
+            color: rgba(107, 255, 107, 0.8);
+        }
+
+        .auto-save-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Navigation Controls */
+        .navigation-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 32px;
+        }
+
+        .btn {
+            padding: 12px 32px;
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s;
+        }
+
+        .btn:hover:before {
+            left: 100%;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, rgba(168, 237, 234, 0.3), rgba(254, 214, 227, 0.3));
+            color: white;
+            border: 1px solid rgba(168, 237, 234, 0.4);
+            box-shadow: 0 4px 12px rgba(168, 237, 234, 0.2);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, rgba(168, 237, 234, 0.4), rgba(254, 214, 227, 0.4));
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(168, 237, 234, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        /* Preview/Summary */
+        .preview-section {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 24px;
+            margin-top: 24px;
+        }
+
+        .preview-title {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.2rem;
+            margin-bottom: 16px;
+            font-weight: 500;
+        }
+
+        .preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+
+        .preview-item {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(8px);
+            border-radius: 12px;
+            padding: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .preview-label {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .preview-value {
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 500;
+        }
+
+        /* Success Animation */
+        .success-animation {
+            display: none;
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .success-animation.show {
+            display: block;
+            animation: successFade 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes successFade {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 24px;
+            background: linear-gradient(135deg, rgba(107, 255, 107, 0.3), rgba(168, 237, 234, 0.3));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 32px;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(107, 255, 107, 0.4);
+            box-shadow: 0 8px 32px rgba(107, 255, 107, 0.3);
+        }
+
+        .success-title {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 2rem;
+            margin-bottom: 12px;
+            font-weight: 300;
+        }
+
+        .success-message {
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 32px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hybrid-component {
+                padding: 24px;
+            }
+            
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+            
+            .progress-steps {
+                flex-wrap: wrap;
+                gap: 16px;
+            }
+            
+            .navigation-controls {
+                flex-direction: column;
+                gap: 12px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <h1>Form Wizard - Glass Morphism Theme</h1>
+        
+        <div class="hybrid-component">
+            <!-- Auto-save indicator -->
+            <div class="auto-save" id="autoSaveIndicator">
+                <div class="auto-save-dot"></div>
+                <span id="autoSaveText">Auto-saving...</span>
+            </div>
+
+            <!-- Multi-step Progress Indicator -->
+            <div class="progress-section">
+                <div class="progress-steps">
+                    <div class="progress-line">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <div class="step active" data-step="1">
+                        <div class="step-circle">1</div>
+                        <div class="step-label">Personal Info</div>
+                    </div>
+                    <div class="step" data-step="2">
+                        <div class="step-circle">2</div>
+                        <div class="step-label">Contact Details</div>
+                    </div>
+                    <div class="step" data-step="3">
+                        <div class="step-circle">3</div>
+                        <div class="step-label">Preferences</div>
+                    </div>
+                    <div class="step" data-step="4">
+                        <div class="step-circle">4</div>
+                        <div class="step-label">Review</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Container -->
+            <div class="form-container">
+                <!-- Step 1: Personal Information -->
+                <div class="form-step active" id="step1">
+                    <h2 class="step-title">Personal Information</h2>
+                    <p class="step-subtitle">Let's start with some basic information about you</p>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="firstName">First Name *</label>
+                            <input type="text" id="firstName" name="firstName" placeholder="Enter your first name" required>
+                            <div class="error-message" id="firstNameError"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="lastName">Last Name *</label>
+                            <input type="text" id="lastName" name="lastName" placeholder="Enter your last name" required>
+                            <div class="error-message" id="lastNameError"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="dateOfBirth">Date of Birth *</label>
+                        <input type="date" id="dateOfBirth" name="dateOfBirth" required>
+                        <div class="error-message" id="dateOfBirthError"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="gender">Gender</label>
+                        <select id="gender" name="gender">
+                            <option value="">Select your gender</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                            <option value="other">Other</option>
+                            <option value="prefer-not-to-say">Prefer not to say</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Step 2: Contact Details -->
+                <div class="form-step" id="step2">
+                    <h2 class="step-title">Contact Details</h2>
+                    <p class="step-subtitle">How can we reach you?</p>
+                    
+                    <div class="form-group">
+                        <label for="email">Email Address *</label>
+                        <input type="email" id="email" name="email" placeholder="your.email@example.com" required>
+                        <div class="error-message" id="emailError"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="phone">Phone Number *</label>
+                        <input type="tel" id="phone" name="phone" placeholder="+1 (555) 123-4567" required>
+                        <div class="error-message" id="phoneError"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="address">Street Address</label>
+                        <input type="text" id="address" name="address" placeholder="123 Main Street">
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="city">City</label>
+                            <input type="text" id="city" name="city" placeholder="Your city">
+                        </div>
+                        <div class="form-group">
+                            <label for="zipCode">ZIP Code</label>
+                            <input type="text" id="zipCode" name="zipCode" placeholder="12345">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 3: Preferences -->
+                <div class="form-step" id="step3">
+                    <h2 class="step-title">Preferences</h2>
+                    <p class="step-subtitle">Tell us about your preferences</p>
+                    
+                    <div class="form-group">
+                        <label for="interests">Interests</label>
+                        <select id="interests" name="interests" multiple>
+                            <option value="technology">Technology</option>
+                            <option value="sports">Sports</option>
+                            <option value="music">Music</option>
+                            <option value="travel">Travel</option>
+                            <option value="cooking">Cooking</option>
+                            <option value="reading">Reading</option>
+                            <option value="fitness">Fitness</option>
+                            <option value="art">Art</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="newsletter">Newsletter Subscription</label>
+                        <select id="newsletter" name="newsletter">
+                            <option value="weekly">Weekly Newsletter</option>
+                            <option value="monthly">Monthly Newsletter</option>
+                            <option value="none">No Newsletter</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="bio">Tell us about yourself</label>
+                        <textarea id="bio" name="bio" rows="4" placeholder="Share a bit about yourself..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Step 4: Review -->
+                <div class="form-step" id="step4">
+                    <h2 class="step-title">Review Your Information</h2>
+                    <p class="step-subtitle">Please review all information before submitting</p>
+                    
+                    <div class="preview-section">
+                        <h3 class="preview-title">Personal Information</h3>
+                        <div class="preview-grid" id="personalPreview">
+                            <!-- Populated by JavaScript -->
+                        </div>
+                    </div>
+                    
+                    <div class="preview-section">
+                        <h3 class="preview-title">Contact Details</h3>
+                        <div class="preview-grid" id="contactPreview">
+                            <!-- Populated by JavaScript -->
+                        </div>
+                    </div>
+                    
+                    <div class="preview-section">
+                        <h3 class="preview-title">Preferences</h3>
+                        <div class="preview-grid" id="preferencesPreview">
+                            <!-- Populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Success Message -->
+                <div class="success-animation" id="successMessage">
+                    <div class="success-icon">✓</div>
+                    <h2 class="success-title">Form Submitted Successfully!</h2>
+                    <p class="success-message">Thank you for providing your information. We'll be in touch soon.</p>
+                    <button class="btn btn-primary" onclick="resetForm()">Start New Form</button>
+                </div>
+            </div>
+
+            <!-- Step Navigation Controls -->
+            <div class="navigation-controls" id="navigationControls">
+                <button type="button" class="btn btn-secondary" id="prevBtn" onclick="changeStep(-1)" disabled>
+                    Previous
+                </button>
+                <div style="display: flex; gap: 12px;">
+                    <button type="button" class="btn btn-secondary" onclick="saveAsDraft()">
+                        Save as Draft
+                    </button>
+                    <button type="button" class="btn btn-primary" id="nextBtn" onclick="changeStep(1)">
+                        Next
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Form state management
+        let currentStep = 1;
+        const totalSteps = 4;
+        let formData = {};
+        let autoSaveTimer = null;
+
+        // Validation rules
+        const validationRules = {
+            firstName: { required: true, minLength: 2 },
+            lastName: { required: true, minLength: 2 },
+            dateOfBirth: { required: true },
+            email: { required: true, email: true },
+            phone: { required: true, phone: true }
+        };
+
+        // Initialize form
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDraftData();
+            setupAutoSave();
+            updateProgressIndicator();
+            populateFormData();
+        });
+
+        // Step navigation
+        function changeStep(direction) {
+            if (direction === 1 && !validateCurrentStep()) {
+                return;
+            }
+
+            const newStep = currentStep + direction;
+            if (newStep < 1 || newStep > totalSteps) return;
+
+            // Hide current step
+            document.getElementById(`step${currentStep}`).classList.remove('active');
+            
+            // Update step
+            currentStep = newStep;
+            
+            // Show new step
+            document.getElementById(`step${currentStep}`).classList.add('active');
+            
+            // Update progress indicator
+            updateProgressIndicator();
+            
+            // Update navigation buttons
+            updateNavigationButtons();
+            
+            // If step 4 (review), populate preview
+            if (currentStep === 4) {
+                populatePreview();
+            }
+            
+            // Save current state
+            saveFormData();
+        }
+
+        // Update progress indicator
+        function updateProgressIndicator() {
+            const steps = document.querySelectorAll('.step');
+            const progressFill = document.getElementById('progressFill');
+            
+            steps.forEach((step, index) => {
+                const stepNum = index + 1;
+                step.classList.remove('active', 'completed');
+                
+                if (stepNum < currentStep) {
+                    step.classList.add('completed');
+                } else if (stepNum === currentStep) {
+                    step.classList.add('active');
+                }
+            });
+            
+            // Update progress bar
+            const progress = ((currentStep - 1) / (totalSteps - 1)) * 100;
+            progressFill.style.width = `${progress}%`;
+        }
+
+        // Update navigation buttons
+        function updateNavigationButtons() {
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            
+            prevBtn.disabled = currentStep === 1;
+            
+            if (currentStep === totalSteps) {
+                nextBtn.textContent = 'Submit';
+                nextBtn.onclick = submitForm;
+            } else {
+                nextBtn.textContent = 'Next';
+                nextBtn.onclick = () => changeStep(1);
+            }
+        }
+
+        // Form validation
+        function validateField(fieldName, value) {
+            const rules = validationRules[fieldName];
+            if (!rules) return true;
+
+            const errors = [];
+            
+            if (rules.required && (!value || value.trim() === '')) {
+                errors.push('This field is required');
+            }
+            
+            if (rules.minLength && value && value.length < rules.minLength) {
+                errors.push(`Must be at least ${rules.minLength} characters`);
+            }
+            
+            if (rules.email && value && !isValidEmail(value)) {
+                errors.push('Please enter a valid email address');
+            }
+            
+            if (rules.phone && value && !isValidPhone(value)) {
+                errors.push('Please enter a valid phone number');
+            }
+            
+            return errors;
+        }
+
+        function isValidEmail(email) {
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        }
+
+        function isValidPhone(phone) {
+            return /^[\+]?[\d\s\-\(\)]{10,}$/.test(phone);
+        }
+
+        function validateCurrentStep() {
+            let isValid = true;
+            const currentStepElement = document.getElementById(`step${currentStep}`);
+            const inputs = currentStepElement.querySelectorAll('input[required], select[required]');
+            
+            inputs.forEach(input => {
+                const errors = validateField(input.name, input.value);
+                const errorElement = document.getElementById(`${input.name}Error`);
+                
+                if (Array.isArray(errors) && errors.length > 0) {
+                    input.classList.add('error');
+                    input.classList.remove('success');
+                    if (errorElement) {
+                        errorElement.textContent = errors[0];
+                    }
+                    isValid = false;
+                } else {
+                    input.classList.remove('error');
+                    input.classList.add('success');
+                    if (errorElement) {
+                        errorElement.textContent = '';
+                    }
+                }
+            });
+            
+            return isValid;
+        }
+
+        // Auto-save functionality
+        function setupAutoSave() {
+            const inputs = document.querySelectorAll('input, select, textarea');
+            inputs.forEach(input => {
+                input.addEventListener('input', debounce(autoSave, 1000));
+                input.addEventListener('change', debounce(autoSave, 1000));
+            });
+        }
+
+        function autoSave() {
+            showAutoSaveIndicator('saving');
+            saveFormData();
+            
+            setTimeout(() => {
+                showAutoSaveIndicator('saved');
+                setTimeout(() => {
+                    hideAutoSaveIndicator();
+                }, 2000);
+            }, 500);
+        }
+
+        function showAutoSaveIndicator(state) {
+            const indicator = document.getElementById('autoSaveIndicator');
+            const text = document.getElementById('autoSaveText');
+            
+            indicator.className = `auto-save ${state}`;
+            text.textContent = state === 'saving' ? 'Auto-saving...' : 'Saved';
+        }
+
+        function hideAutoSaveIndicator() {
+            const indicator = document.getElementById('autoSaveIndicator');
+            indicator.className = 'auto-save';
+        }
+
+        // Form data management
+        function saveFormData() {
+            const inputs = document.querySelectorAll('input, select, textarea');
+            formData = {};
+            
+            inputs.forEach(input => {
+                if (input.type === 'checkbox') {
+                    formData[input.name] = input.checked;
+                } else if (input.multiple) {
+                    formData[input.name] = Array.from(input.selectedOptions).map(option => option.value);
+                } else {
+                    formData[input.name] = input.value;
+                }
+            });
+            
+            localStorage.setItem('wizardFormData', JSON.stringify(formData));
+        }
+
+        function loadDraftData() {
+            const savedData = localStorage.getItem('wizardFormData');
+            if (savedData) {
+                formData = JSON.parse(savedData);
+                populateFormData();
+            }
+        }
+
+        function populateFormData() {
+            Object.keys(formData).forEach(key => {
+                const element = document.querySelector(`[name="${key}"]`);
+                if (element) {
+                    if (element.type === 'checkbox') {
+                        element.checked = formData[key];
+                    } else if (element.multiple) {
+                        Array.from(element.options).forEach(option => {
+                            option.selected = formData[key] && formData[key].includes(option.value);
+                        });
+                    } else {
+                        element.value = formData[key] || '';
+                    }
+                }
+            });
+        }
+
+        function saveAsDraft() {
+            saveFormData();
+            showAutoSaveIndicator('saved');
+            
+            // Show confirmation
+            const btn = event.target;
+            const originalText = btn.textContent;
+            btn.textContent = 'Draft Saved!';
+            btn.style.background = 'rgba(107, 255, 107, 0.3)';
+            
+            setTimeout(() => {
+                btn.textContent = originalText;
+                btn.style.background = '';
+                hideAutoSaveIndicator();
+            }, 2000);
+        }
+
+        // Preview population
+        function populatePreview() {
+            populatePersonalPreview();
+            populateContactPreview();
+            populatePreferencesPreview();
+        }
+
+        function populatePersonalPreview() {
+            const container = document.getElementById('personalPreview');
+            container.innerHTML = '';
+            
+            const personalFields = [
+                { key: 'firstName', label: 'First Name' },
+                { key: 'lastName', label: 'Last Name' },
+                { key: 'dateOfBirth', label: 'Date of Birth' },
+                { key: 'gender', label: 'Gender' }
+            ];
+            
+            personalFields.forEach(field => {
+                const value = formData[field.key] || 'Not provided';
+                container.innerHTML += createPreviewItem(field.label, value);
+            });
+        }
+
+        function populateContactPreview() {
+            const container = document.getElementById('contactPreview');
+            container.innerHTML = '';
+            
+            const contactFields = [
+                { key: 'email', label: 'Email' },
+                { key: 'phone', label: 'Phone' },
+                { key: 'address', label: 'Address' },
+                { key: 'city', label: 'City' },
+                { key: 'zipCode', label: 'ZIP Code' }
+            ];
+            
+            contactFields.forEach(field => {
+                const value = formData[field.key] || 'Not provided';
+                container.innerHTML += createPreviewItem(field.label, value);
+            });
+        }
+
+        function populatePreferencesPreview() {
+            const container = document.getElementById('preferencesPreview');
+            container.innerHTML = '';
+            
+            const interests = Array.isArray(formData.interests) ? formData.interests.join(', ') : 'None selected';
+            const newsletter = formData.newsletter || 'Not selected';
+            const bio = formData.bio || 'Not provided';
+            
+            container.innerHTML += createPreviewItem('Interests', interests);
+            container.innerHTML += createPreviewItem('Newsletter', newsletter);
+            container.innerHTML += createPreviewItem('Bio', bio);
+        }
+
+        function createPreviewItem(label, value) {
+            return `
+                <div class="preview-item">
+                    <div class="preview-label">${label}</div>
+                    <div class="preview-value">${value}</div>
+                </div>
+            `;
+        }
+
+        // Form submission
+        function submitForm() {
+            if (!validateCurrentStep()) {
+                return;
+            }
+            
+            saveFormData();
+            
+            // Hide form and show success message
+            document.querySelector('.form-container').style.display = 'none';
+            document.getElementById('navigationControls').style.display = 'none';
+            document.getElementById('successMessage').classList.add('show');
+            
+            // Clear saved data
+            localStorage.removeItem('wizardFormData');
+        }
+
+        // Reset form
+        function resetForm() {
+            // Reset form data
+            formData = {};
+            currentStep = 1;
+            
+            // Clear form
+            document.querySelectorAll('input, select, textarea').forEach(input => {
+                if (input.type === 'checkbox') {
+                    input.checked = false;
+                } else {
+                    input.value = '';
+                }
+                input.classList.remove('error', 'success');
+            });
+            
+            // Clear error messages
+            document.querySelectorAll('.error-message').forEach(error => {
+                error.textContent = '';
+            });
+            
+            // Reset UI
+            document.querySelector('.form-container').style.display = 'block';
+            document.getElementById('navigationControls').style.display = 'flex';
+            document.getElementById('successMessage').classList.remove('show');
+            
+            // Show first step
+            document.querySelectorAll('.form-step').forEach(step => {
+                step.classList.remove('active');
+            });
+            document.getElementById('step1').classList.add('active');
+            
+            // Update progress
+            updateProgressIndicator();
+            updateNavigationButtons();
+            
+            // Clear local storage
+            localStorage.removeItem('wizardFormData');
+        }
+
+        // Utility functions
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && e.ctrlKey) {
+                if (currentStep < totalSteps) {
+                    changeStep(1);
+                } else {
+                    submitForm();
+                }
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyberpunk Future Media Player Hub</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Source+Code+Pro:wght@300;400;600&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --neon-pink: #ff006e;
+            --neon-blue: #00d4ff;
+            --matrix-green: #00ff41;
+            --electric-purple: #b300ff;
+            --cyber-orange: #ff9500;
+            --dark-bg: #0a0a0a;
+            --darker-bg: #050505;
+            --glass-bg: rgba(0, 0, 0, 0.7);
+            --scan-line: rgba(0, 255, 65, 0.1);
+        }
+
+        body {
+            font-family: 'Source Code Pro', monospace;
+            background: var(--dark-bg);
+            color: var(--neon-blue);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Cyberpunk background effects */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(45deg, transparent 48%, var(--scan-line) 49%, var(--scan-line) 51%, transparent 52%),
+                linear-gradient(-45deg, transparent 48%, rgba(255, 0, 110, 0.05) 49%, rgba(255, 0, 110, 0.05) 51%, transparent 52%),
+                radial-gradient(circle at 20% 80%, rgba(0, 212, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 0, 110, 0.1) 0%, transparent 50%);
+            background-size: 60px 60px, 60px 60px, 100% 100%, 100% 100%;
+            animation: cyberpunk-bg 8s linear infinite;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        @keyframes cyberpunk-bg {
+            0% { transform: translateX(0px); }
+            100% { transform: translateX(60px); }
+        }
+
+        /* Scan lines effect */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0, 255, 65, 0.03) 2px,
+                rgba(0, 255, 65, 0.03) 4px
+            );
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        h1 {
+            font-family: 'Orbitron', monospace;
+            font-weight: 900;
+            font-size: 2.5rem;
+            text-align: center;
+            margin: 2rem 0;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            background: linear-gradient(45deg, var(--neon-pink), var(--neon-blue), var(--matrix-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
+            animation: glitch-text 3s infinite;
+        }
+
+        @keyframes glitch-text {
+            0%, 90%, 100% { transform: translateX(0); }
+            92% { transform: translateX(-2px); }
+            94% { transform: translateX(2px); }
+            96% { transform: translateX(-1px); }
+        }
+
+        .media-hub {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            grid-template-rows: auto auto 1fr;
+            gap: 2rem;
+            height: calc(100vh - 200px);
+        }
+
+        .main-player {
+            grid-column: 1 / 2;
+            grid-row: 1 / 2;
+            background: var(--glass-bg);
+            border: 2px solid var(--neon-blue);
+            border-radius: 15px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 
+                0 0 30px rgba(0, 212, 255, 0.3),
+                inset 0 0 30px rgba(0, 212, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .main-player::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(0, 212, 255, 0.1), transparent);
+            animation: holographic-sweep 4s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes holographic-sweep {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        .track-info {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .album-art {
+            width: 80px;
+            height: 80px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--neon-pink), var(--electric-purple));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            box-shadow: 0 0 20px rgba(255, 0, 110, 0.4);
+            animation: pulse-glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes pulse-glow {
+            0% { box-shadow: 0 0 20px rgba(255, 0, 110, 0.4); }
+            100% { box-shadow: 0 0 30px rgba(255, 0, 110, 0.7); }
+        }
+
+        .track-details h3 {
+            font-family: 'Orbitron', monospace;
+            color: var(--neon-pink);
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 0 10px rgba(255, 0, 110, 0.5);
+        }
+
+        .track-details p {
+            color: var(--matrix-green);
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .progress-container {
+            margin: 2rem 0;
+            position: relative;
+            z-index: 2;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(0, 212, 255, 0.2);
+            border-radius: 4px;
+            position: relative;
+            cursor: pointer;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--neon-pink), var(--neon-blue));
+            border-radius: 4px;
+            width: 35%;
+            position: relative;
+            transition: width 0.3s ease;
+            box-shadow: 0 0 15px rgba(0, 212, 255, 0.6);
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            right: -6px;
+            top: -4px;
+            width: 16px;
+            height: 16px;
+            background: var(--neon-blue);
+            border-radius: 50%;
+            box-shadow: 0 0 15px rgba(0, 212, 255, 0.8);
+        }
+
+        .time-display {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--matrix-green);
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+            margin: 2rem 0;
+            position: relative;
+            z-index: 2;
+        }
+
+        .control-btn {
+            background: transparent;
+            border: 2px solid var(--neon-blue);
+            color: var(--neon-blue);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .control-btn:hover {
+            background: var(--neon-blue);
+            color: var(--dark-bg);
+            box-shadow: 0 0 25px rgba(0, 212, 255, 0.7);
+            transform: scale(1.1);
+        }
+
+        .control-btn.play-btn {
+            width: 70px;
+            height: 70px;
+            border-color: var(--neon-pink);
+            color: var(--neon-pink);
+            font-size: 1.5rem;
+        }
+
+        .control-btn.play-btn:hover {
+            background: var(--neon-pink);
+            box-shadow: 0 0 25px rgba(255, 0, 110, 0.7);
+        }
+
+        .volume-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 1rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .volume-slider {
+            flex: 1;
+            height: 6px;
+            background: rgba(0, 212, 255, 0.2);
+            border-radius: 3px;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .volume-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--matrix-green), var(--neon-blue));
+            border-radius: 3px;
+            width: 70%;
+            box-shadow: 0 0 10px rgba(0, 255, 65, 0.5);
+        }
+
+        .playlist {
+            grid-column: 2 / 3;
+            grid-row: 1 / 4;
+            background: var(--glass-bg);
+            border: 2px solid var(--matrix-green);
+            border-radius: 15px;
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 0 30px rgba(0, 255, 65, 0.3);
+            overflow-y: auto;
+        }
+
+        .playlist h3 {
+            font-family: 'Orbitron', monospace;
+            color: var(--matrix-green);
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-shadow: 0 0 10px rgba(0, 255, 65, 0.5);
+        }
+
+        .playlist-item {
+            padding: 0.8rem;
+            margin-bottom: 0.5rem;
+            background: rgba(0, 255, 65, 0.1);
+            border: 1px solid rgba(0, 255, 65, 0.3);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .playlist-item:hover {
+            background: rgba(0, 255, 65, 0.2);
+            transform: translateX(5px);
+            box-shadow: 0 0 15px rgba(0, 255, 65, 0.4);
+        }
+
+        .playlist-item.active {
+            background: rgba(255, 0, 110, 0.2);
+            border-color: var(--neon-pink);
+            box-shadow: 0 0 15px rgba(255, 0, 110, 0.4);
+        }
+
+        .playlist-item .title {
+            font-weight: 600;
+            color: var(--neon-blue);
+            font-size: 0.9rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .playlist-item .artist {
+            font-size: 0.8rem;
+            color: var(--matrix-green);
+            opacity: 0.8;
+        }
+
+        .visualizer {
+            grid-column: 1 / 2;
+            grid-row: 2 / 3;
+            background: var(--glass-bg);
+            border: 2px solid var(--electric-purple);
+            border-radius: 15px;
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 0 30px rgba(179, 0, 255, 0.3);
+            height: 200px;
+            display: flex;
+            align-items: end;
+            justify-content: center;
+            gap: 3px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .visualizer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, 
+                rgba(179, 0, 255, 0.1), 
+                rgba(255, 0, 110, 0.1), 
+                rgba(0, 212, 255, 0.1));
+            animation: visualizer-bg 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes visualizer-bg {
+            0% { opacity: 0.5; }
+            100% { opacity: 0.8; }
+        }
+
+        .bar {
+            width: 4px;
+            background: linear-gradient(to top, var(--neon-pink), var(--electric-purple), var(--neon-blue));
+            border-radius: 2px;
+            animation: visualizer-dance 0.5s ease-in-out infinite alternate;
+            box-shadow: 0 0 10px rgba(179, 0, 255, 0.6);
+            position: relative;
+            z-index: 2;
+        }
+
+        @keyframes visualizer-dance {
+            0% { transform: scaleY(0.3); }
+            100% { transform: scaleY(1); }
+        }
+
+        .sharing-controls {
+            grid-column: 1 / 2;
+            grid-row: 3 / 4;
+            background: var(--glass-bg);
+            border: 2px solid var(--cyber-orange);
+            border-radius: 15px;
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 0 30px rgba(255, 149, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .sharing-controls h3 {
+            font-family: 'Orbitron', monospace;
+            color: var(--cyber-orange);
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-shadow: 0 0 10px rgba(255, 149, 0, 0.5);
+        }
+
+        .quality-selector {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+
+        .quality-btn {
+            padding: 0.5rem 1rem;
+            background: transparent;
+            border: 1px solid var(--cyber-orange);
+            color: var(--cyber-orange);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.8rem;
+            font-family: 'Source Code Pro', monospace;
+        }
+
+        .quality-btn:hover, .quality-btn.active {
+            background: var(--cyber-orange);
+            color: var(--dark-bg);
+            box-shadow: 0 0 15px rgba(255, 149, 0, 0.5);
+            transform: scale(1.05);
+        }
+
+        .share-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .share-btn {
+            padding: 0.8rem 1.5rem;
+            background: transparent;
+            border: 2px solid var(--neon-blue);
+            color: var(--neon-blue);
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Source Code Pro', monospace;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .share-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.4), transparent);
+            transition: left 0.5s;
+        }
+
+        .share-btn:hover::before {
+            left: 100%;
+        }
+
+        .share-btn:hover {
+            background: var(--neon-blue);
+            color: var(--dark-bg);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.6);
+            transform: translateY(-2px);
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .media-hub {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto auto auto;
+                height: auto;
+            }
+            
+            .main-player {
+                grid-column: 1;
+                grid-row: 1;
+            }
+            
+            .playlist {
+                grid-column: 1;
+                grid-row: 2;
+                max-height: 300px;
+            }
+            
+            .visualizer {
+                grid-column: 1;
+                grid-row: 3;
+            }
+            
+            .sharing-controls {
+                grid-column: 1;
+                grid-row: 4;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+        }
+
+        /* Glitch effects for buttons */
+        .glitch-effect {
+            position: relative;
+        }
+
+        .glitch-effect::before,
+        .glitch-effect::after {
+            content: attr(data-text);
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: inherit;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .glitch-effect:hover::before {
+            animation: glitch-1 0.3s ease-in-out;
+            opacity: 1;
+            color: var(--neon-pink);
+            transform: translateX(-2px);
+        }
+
+        .glitch-effect:hover::after {
+            animation: glitch-2 0.3s ease-in-out;
+            opacity: 1;
+            color: var(--matrix-green);
+            transform: translateX(2px);
+        }
+
+        @keyframes glitch-1 {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-2px); }
+            40% { transform: translateX(-1px); }
+            60% { transform: translateX(-2px); }
+            80% { transform: translateX(-1px); }
+        }
+
+        @keyframes glitch-2 {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(2px); }
+            40% { transform: translateX(1px); }
+            60% { transform: translateX(2px); }
+            80% { transform: translateX(1px); }
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <h1>Cyberpunk Future Media Player Hub</h1>
+        
+        <div class="media-hub">
+            <!-- Main Player Section -->
+            <section class="main-player">
+                <div class="track-info">
+                    <div class="album-art">♪</div>
+                    <div class="track-details">
+                        <h3 id="current-title">Neon Dreams</h3>
+                        <p id="current-artist">Cyber Syndicate</p>
+                        <p id="current-format">FLAC • 24-bit/96kHz</p>
+                    </div>
+                </div>
+                
+                <div class="progress-container">
+                    <div class="progress-bar" id="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                    <div class="time-display">
+                        <span id="current-time">1:23</span>
+                        <span id="total-time">3:47</span>
+                    </div>
+                </div>
+                
+                <div class="controls">
+                    <button class="control-btn" id="prev-btn">⏮</button>
+                    <button class="control-btn play-btn" id="play-btn">⏸</button>
+                    <button class="control-btn" id="next-btn">⏭</button>
+                    <button class="control-btn" id="shuffle-btn">🔀</button>
+                    <button class="control-btn" id="repeat-btn">🔁</button>
+                </div>
+                
+                <div class="volume-container">
+                    <span>🔊</span>
+                    <div class="volume-slider" id="volume-slider">
+                        <div class="volume-fill" id="volume-fill"></div>
+                    </div>
+                    <span id="volume-display">70%</span>
+                </div>
+            </section>
+            
+            <!-- Playlist Section -->
+            <section class="playlist">
+                <h3>Neural Playlist</h3>
+                <div id="playlist-container">
+                    <!-- Playlist items will be populated by JavaScript -->
+                </div>
+            </section>
+            
+            <!-- Audio Visualizer -->
+            <section class="visualizer" id="visualizer">
+                <!-- Visualizer bars will be generated by JavaScript -->
+            </section>
+            
+            <!-- Sharing & Quality Controls -->
+            <section class="sharing-controls">
+                <h3>Export & Share</h3>
+                
+                <div class="quality-selector">
+                    <button class="quality-btn active" data-quality="flac">FLAC</button>
+                    <button class="quality-btn" data-quality="320">MP3 320</button>
+                    <button class="quality-btn" data-quality="256">AAC 256</button>
+                    <button class="quality-btn" data-quality="stream">Stream</button>
+                </div>
+                
+                <div class="share-buttons">
+                    <button class="share-btn glitch-effect" data-text="Neural Link">Neural Link</button>
+                    <button class="share-btn glitch-effect" data-text="Holo Share">Holo Share</button>
+                    <button class="share-btn glitch-effect" data-text="Quantum Sync">Quantum Sync</button>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script>
+        // Realistic cyberpunk music data
+        const tracks = [
+            {
+                title: "Neon Dreams",
+                artist: "Cyber Syndicate",
+                format: "FLAC • 24-bit/96kHz",
+                duration: "3:47",
+                id: 1
+            },
+            {
+                title: "Digital Horizon",
+                artist: "Neural Network",
+                format: "FLAC • 24-bit/48kHz",
+                duration: "4:12",
+                id: 2
+            },
+            {
+                title: "Ghost in the Machine",
+                artist: "Quantum Echo",
+                format: "FLAC • 16-bit/44.1kHz",
+                duration: "5:23",
+                id: 3
+            },
+            {
+                title: "Chrome Hearts",
+                artist: "Synthwave Collective",
+                format: "FLAC • 24-bit/96kHz",
+                duration: "3:31",
+                id: 4
+            },
+            {
+                title: "Binary Sunset",
+                artist: "Cyber Syndicate",
+                format: "FLAC • 24-bit/48kHz",
+                duration: "4:45",
+                id: 5
+            },
+            {
+                title: "Electric Memories",
+                artist: "Data Stream",
+                format: "FLAC • 24-bit/96kHz",
+                duration: "3:58",
+                id: 6
+            }
+        ];
+
+        let currentTrack = 0;
+        let isPlaying = false;
+        let currentTime = 83; // 1:23 in seconds
+        let currentVolume = 70;
+
+        // Initialize the player
+        function initializePlayer() {
+            renderPlaylist();
+            generateVisualizerBars();
+            updateTrackInfo();
+            startVisualizerAnimation();
+            updateProgressSimulation();
+        }
+
+        // Render playlist
+        function renderPlaylist() {
+            const container = document.getElementById('playlist-container');
+            container.innerHTML = '';
+            
+            tracks.forEach((track, index) => {
+                const item = document.createElement('div');
+                item.className = `playlist-item ${index === currentTrack ? 'active' : ''}`;
+                item.innerHTML = `
+                    <div class="title">${track.title}</div>
+                    <div class="artist">${track.artist} • ${track.duration}</div>
+                `;
+                item.addEventListener('click', () => selectTrack(index));
+                container.appendChild(item);
+            });
+        }
+
+        // Select track
+        function selectTrack(index) {
+            currentTrack = index;
+            updateTrackInfo();
+            renderPlaylist();
+            simulateTrackChange();
+        }
+
+        // Update track info
+        function updateTrackInfo() {
+            const track = tracks[currentTrack];
+            document.getElementById('current-title').textContent = track.title;
+            document.getElementById('current-artist').textContent = track.artist;
+            document.getElementById('current-format').textContent = track.format;
+            document.getElementById('total-time').textContent = track.duration;
+        }
+
+        // Generate visualizer bars
+        function generateVisualizerBars() {
+            const visualizer = document.getElementById('visualizer');
+            visualizer.innerHTML = '';
+            
+            for (let i = 0; i < 40; i++) {
+                const bar = document.createElement('div');
+                bar.className = 'bar';
+                bar.style.height = Math.random() * 100 + 20 + 'px';
+                bar.style.animationDelay = Math.random() * 0.5 + 's';
+                bar.style.animationDuration = Math.random() * 0.3 + 0.4 + 's';
+                visualizer.appendChild(bar);
+            }
+        }
+
+        // Start visualizer animation
+        function startVisualizerAnimation() {
+            setInterval(() => {
+                const bars = document.querySelectorAll('.bar');
+                bars.forEach(bar => {
+                    const intensity = isPlaying ? Math.random() * 100 + 20 : 20;
+                    bar.style.height = intensity + 'px';
+                    
+                    // Add some color variation based on intensity
+                    if (intensity > 80) {
+                        bar.style.background = 'linear-gradient(to top, var(--neon-pink), var(--electric-purple), var(--neon-blue))';
+                    } else if (intensity > 50) {
+                        bar.style.background = 'linear-gradient(to top, var(--matrix-green), var(--neon-blue))';
+                    } else {
+                        bar.style.background = 'linear-gradient(to top, var(--neon-blue), var(--electric-purple))';
+                    }
+                });
+            }, 100);
+        }
+
+        // Progress simulation
+        function updateProgressSimulation() {
+            const track = tracks[currentTrack];
+            const totalSeconds = parseFloat(track.duration.split(':')[0]) * 60 + parseFloat(track.duration.split(':')[1]);
+            
+            setInterval(() => {
+                if (isPlaying) {
+                    currentTime += 1;
+                    if (currentTime >= totalSeconds) {
+                        nextTrack();
+                    }
+                }
+                updateProgressDisplay();
+            }, 1000);
+        }
+
+        // Update progress display
+        function updateProgressDisplay() {
+            const track = tracks[currentTrack];
+            const totalSeconds = parseFloat(track.duration.split(':')[0]) * 60 + parseFloat(track.duration.split(':')[1]);
+            const progress = (currentTime / totalSeconds) * 100;
+            
+            document.getElementById('progress-fill').style.width = Math.min(progress, 100) + '%';
+            
+            const minutes = Math.floor(currentTime / 60);
+            const seconds = Math.floor(currentTime % 60);
+            document.getElementById('current-time').textContent = 
+                `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        // Media controls
+        document.getElementById('play-btn').addEventListener('click', () => {
+            isPlaying = !isPlaying;
+            document.getElementById('play-btn').textContent = isPlaying ? '⏸' : '▶';
+            
+            // Add glitch effect on play/pause
+            const btn = document.getElementById('play-btn');
+            btn.style.animation = 'glitch-1 0.3s ease-in-out';
+            setTimeout(() => {
+                btn.style.animation = '';
+            }, 300);
+        });
+
+        document.getElementById('prev-btn').addEventListener('click', () => {
+            currentTrack = currentTrack > 0 ? currentTrack - 1 : tracks.length - 1;
+            selectTrack(currentTrack);
+        });
+
+        document.getElementById('next-btn').addEventListener('click', nextTrack);
+
+        function nextTrack() {
+            currentTrack = (currentTrack + 1) % tracks.length;
+            selectTrack(currentTrack);
+        }
+
+        function simulateTrackChange() {
+            currentTime = 0;
+            // Simulate loading new track
+            const progressFill = document.getElementById('progress-fill');
+            progressFill.style.transition = 'none';
+            progressFill.style.width = '0%';
+            setTimeout(() => {
+                progressFill.style.transition = 'width 0.3s ease';
+            }, 100);
+        }
+
+        // Progress bar interaction
+        document.getElementById('progress-bar').addEventListener('click', (e) => {
+            const rect = e.currentTarget.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const percentage = x / rect.width;
+            
+            const track = tracks[currentTrack];
+            const totalSeconds = parseFloat(track.duration.split(':')[0]) * 60 + parseFloat(track.duration.split(':')[1]);
+            currentTime = totalSeconds * percentage;
+            
+            updateProgressDisplay();
+        });
+
+        // Volume control
+        document.getElementById('volume-slider').addEventListener('click', (e) => {
+            const rect = e.currentTarget.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const percentage = Math.round((x / rect.width) * 100);
+            
+            currentVolume = percentage;
+            document.getElementById('volume-fill').style.width = percentage + '%';
+            document.getElementById('volume-display').textContent = percentage + '%';
+        });
+
+        // Quality selector
+        document.querySelectorAll('.quality-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.quality-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                // Update format display based on selection
+                const quality = btn.getAttribute('data-quality');
+                const formatMap = {
+                    'flac': 'FLAC • 24-bit/96kHz',
+                    '320': 'MP3 • 320 kbps',
+                    '256': 'AAC • 256 kbps',
+                    'stream': 'Stream • Adaptive'
+                };
+                
+                document.getElementById('current-format').textContent = formatMap[quality];
+            });
+        });
+
+        // Share buttons with cyberpunk effects
+        document.querySelectorAll('.share-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const action = btn.getAttribute('data-text');
+                
+                // Simulate sharing action
+                btn.style.background = 'var(--matrix-green)';
+                btn.style.color = 'var(--dark-bg)';
+                btn.textContent = 'TRANSMITTING...';
+                
+                setTimeout(() => {
+                    btn.style.background = 'transparent';
+                    btn.style.color = 'var(--neon-blue)';
+                    btn.textContent = action;
+                    
+                    // Show success effect
+                    btn.style.boxShadow = '0 0 30px rgba(0, 255, 65, 0.8)';
+                    setTimeout(() => {
+                        btn.style.boxShadow = '';
+                    }, 1000);
+                }, 1500);
+            });
+        });
+
+        // Shuffle and repeat buttons
+        document.getElementById('shuffle-btn').addEventListener('click', (e) => {
+            e.target.style.color = e.target.style.color === 'var(--matrix-green)' ? 'var(--neon-blue)' : 'var(--matrix-green)';
+        });
+
+        document.getElementById('repeat-btn').addEventListener('click', (e) => {
+            e.target.style.color = e.target.style.color === 'var(--neon-pink)' ? 'var(--neon-blue)' : 'var(--neon-pink)';
+        });
+
+        // Initialize everything when page loads
+        document.addEventListener('DOMContentLoaded', initializePlayer);
+
+        // Add some random glitch effects
+        setInterval(() => {
+            if (Math.random() < 0.1) { // 10% chance every 2 seconds
+                const title = document.getElementById('current-title');
+                title.style.animation = 'glitch-text 0.5s ease-in-out';
+                setTimeout(() => {
+                    title.style.animation = '';
+                }, 500);
+            }
+        }, 2000);
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            switch(e.code) {
+                case 'Space':
+                    e.preventDefault();
+                    document.getElementById('play-btn').click();
+                    break;
+                case 'ArrowLeft':
+                    document.getElementById('prev-btn').click();
+                    break;
+                case 'ArrowRight':
+                    document.getElementById('next-btn').click();
+                    break;
+                case 'ArrowUp':
+                    e.preventDefault();
+                    currentVolume = Math.min(100, currentVolume + 10);
+                    document.getElementById('volume-fill').style.width = currentVolume + '%';
+                    document.getElementById('volume-display').textContent = currentVolume + '%';
+                    break;
+                case 'ArrowDown':
+                    e.preventDefault();
+                    currentVolume = Math.max(0, currentVolume - 10);
+                    document.getElementById('volume-fill').style.width = currentVolume + '%';
+                    document.getElementById('volume-display').textContent = currentVolume + '%';
+                    break;
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zen Philosophy Search Hub - Mindful Discovery</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #f8f6f0 0%, #e8e4d8 100%);
+            color: #5a5a5a;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 0 auto;
+            animation: breatheIn 2s ease-out;
+        }
+
+        @keyframes breatheIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        h1 {
+            text-align: center;
+            color: #6b5b73;
+            font-size: 2.5rem;
+            font-weight: 300;
+            margin-bottom: 40px;
+            letter-spacing: 2px;
+            animation: gentleFloat 6s ease-in-out infinite;
+        }
+
+        @keyframes gentleFloat {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .search-hub {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 
+                0 20px 60px rgba(0, 0, 0, 0.08),
+                0 8px 24px rgba(0, 0, 0, 0.04),
+                inset 0 1px 0 rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            animation: softPulse 8s ease-in-out infinite;
+        }
+
+        @keyframes softPulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08); }
+            50% { transform: scale(1.002); box-shadow: 0 25px 70px rgba(0, 0, 0, 0.12); }
+        }
+
+        .search-section {
+            position: relative;
+            margin-bottom: 40px;
+        }
+
+        .search-input-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.95);
+            border: 2px solid transparent;
+            border-radius: 50px;
+            padding: 0 20px;
+            transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+            overflow: hidden;
+        }
+
+        .search-input-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(139, 117, 165, 0.1), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s ease;
+        }
+
+        .search-input-container:focus-within::before {
+            transform: translateX(100%);
+        }
+
+        .search-input-container:focus-within {
+            border-color: rgba(139, 117, 165, 0.3);
+            box-shadow: 0 0 0 8px rgba(139, 117, 165, 0.08);
+        }
+
+        .search-input {
+            flex: 1;
+            border: none;
+            outline: none;
+            font-size: 1.2rem;
+            padding: 20px 0;
+            background: transparent;
+            color: #5a5a5a;
+            font-family: 'Georgia', serif;
+        }
+
+        .search-input::placeholder {
+            color: #a0a0a0;
+            font-style: italic;
+        }
+
+        .search-icon {
+            width: 24px;
+            height: 24px;
+            margin-right: 15px;
+            opacity: 0.6;
+            transition: all 0.3s ease;
+        }
+
+        .search-input-container:focus-within .search-icon {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+
+        .autocomplete-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(15px);
+            border-radius: 16px;
+            margin-top: 8px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            z-index: 100;
+        }
+
+        .autocomplete-dropdown.show {
+            max-height: 300px;
+        }
+
+        .autocomplete-item {
+            padding: 15px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+        }
+
+        .autocomplete-item:hover {
+            background: rgba(139, 117, 165, 0.1);
+            transform: translateX(5px);
+        }
+
+        .autocomplete-item:last-child {
+            border-bottom: none;
+        }
+
+        .autocomplete-icon {
+            margin-right: 12px;
+            opacity: 0.6;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 40px;
+            margin-top: 40px;
+        }
+
+        .results-section {
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 20px;
+            padding: 30px;
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .recent-searches, .filters-panel, .analytics-panel {
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 20px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .recent-searches:hover, .filters-panel:hover, .analytics-panel:hover {
+            background: rgba(255, 255, 255, 0.9);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .section-title {
+            font-size: 1.1rem;
+            color: #6b5b73;
+            margin-bottom: 20px;
+            font-weight: 400;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+        }
+
+        .section-title::before {
+            content: '';
+            width: 4px;
+            height: 4px;
+            background: #8b75a5;
+            border-radius: 50%;
+            margin-right: 10px;
+            animation: gentlePulse 2s ease-in-out infinite;
+        }
+
+        @keyframes gentlePulse {
+            0%, 100% { opacity: 0.6; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        .recent-item {
+            padding: 12px 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .recent-item:hover {
+            color: #8b75a5;
+            transform: translateX(5px);
+        }
+
+        .recent-item:last-child {
+            border-bottom: none;
+        }
+
+        .recent-time {
+            font-size: 0.8rem;
+            opacity: 0.6;
+        }
+
+        .filter-group {
+            margin-bottom: 20px;
+        }
+
+        .filter-label {
+            display: block;
+            margin-bottom: 8px;
+            color: #6b5b73;
+            font-weight: 400;
+        }
+
+        .filter-select, .filter-input {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid rgba(139, 117, 165, 0.2);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.9);
+            font-family: 'Georgia', serif;
+            transition: all 0.3s ease;
+        }
+
+        .filter-select:focus, .filter-input:focus {
+            outline: none;
+            border-color: rgba(139, 117, 165, 0.5);
+            box-shadow: 0 0 0 4px rgba(139, 117, 165, 0.1);
+        }
+
+        .filter-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .filter-tag {
+            background: rgba(139, 117, 165, 0.1);
+            color: #6b5b73;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(139, 117, 165, 0.2);
+        }
+
+        .filter-tag:hover {
+            background: rgba(139, 117, 165, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .filter-tag.active {
+            background: #8b75a5;
+            color: white;
+        }
+
+        .result-item {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .result-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, transparent, rgba(139, 117, 165, 0.05), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .result-item:hover::before {
+            opacity: 1;
+        }
+
+        .result-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .result-title {
+            font-size: 1.3rem;
+            color: #6b5b73;
+            margin-bottom: 10px;
+            font-weight: 400;
+        }
+
+        .result-description {
+            color: #7a7a7a;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .result-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .result-relevance {
+            background: rgba(139, 117, 165, 0.1);
+            color: #8b75a5;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+
+        .analytics-metric {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .analytics-metric:last-child {
+            border-bottom: none;
+        }
+
+        .metric-label {
+            color: #6b5b73;
+        }
+
+        .metric-value {
+            font-weight: 500;
+            color: #8b75a5;
+        }
+
+        .breathing-animation {
+            animation: breathe 4s ease-in-out infinite;
+        }
+
+        @keyframes breathe {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+
+        .zen-circle {
+            position: fixed;
+            width: 300px;
+            height: 300px;
+            border: 1px solid rgba(139, 117, 165, 0.1);
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: -1;
+            animation: zenRotate 30s linear infinite;
+        }
+
+        @keyframes zenRotate {
+            from { transform: translate(-50%, -50%) rotate(0deg); }
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        .loading-state {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            color: #8b75a5;
+        }
+
+        .loading-state.show {
+            display: flex;
+        }
+
+        .zen-loader {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(139, 117, 165, 0.2);
+            border-top: 3px solid #8b75a5;
+            border-radius: 50%;
+            animation: zenSpin 2s linear infinite;
+            margin-right: 15px;
+        }
+
+        @keyframes zenSpin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .search-hub {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="zen-circle"></div>
+    
+    <main>
+        <h1>Zen Philosophy Search Hub - Mindful Discovery</h1>
+        
+        <div class="search-hub breathing-animation">
+            <div class="search-section">
+                <div class="search-input-container">
+                    <svg class="search-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2"/>
+                        <path d="m21 21-4.35-4.35" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                    <input type="text" class="search-input" placeholder="Search with mindful intention..." id="searchInput">
+                </div>
+                
+                <div class="autocomplete-dropdown" id="autocompleteDropdown">
+                    <div class="autocomplete-item" data-value="meditation techniques">
+                        <span class="autocomplete-icon">🧘</span>
+                        meditation techniques
+                    </div>
+                    <div class="autocomplete-item" data-value="mindfulness practices">
+                        <span class="autocomplete-icon">🌸</span>
+                        mindfulness practices
+                    </div>
+                    <div class="autocomplete-item" data-value="zen philosophy books">
+                        <span class="autocomplete-icon">📚</span>
+                        zen philosophy books
+                    </div>
+                    <div class="autocomplete-item" data-value="breathing exercises">
+                        <span class="autocomplete-icon">🌬️</span>
+                        breathing exercises
+                    </div>
+                    <div class="autocomplete-item" data-value="peaceful gardens">
+                        <span class="autocomplete-icon">🌿</span>
+                        peaceful gardens
+                    </div>
+                </div>
+            </div>
+
+            <div class="main-content">
+                <div class="results-section">
+                    <div class="loading-state" id="loadingState">
+                        <div class="zen-loader"></div>
+                        <span>Finding your path to knowledge...</span>
+                    </div>
+                    
+                    <div id="resultsContainer">
+                        <div class="result-item">
+                            <h3 class="result-title">The Art of Mindful Meditation</h3>
+                            <p class="result-description">Discover the ancient practice of mindful meditation, a cornerstone of Zen philosophy that brings peace and clarity to the modern mind. Learn techniques passed down through generations of practitioners.</p>
+                            <div class="result-meta">
+                                <span>by Master Thich Nhat Hanh</span>
+                                <span class="result-relevance">95% match</span>
+                            </div>
+                        </div>
+                        
+                        <div class="result-item">
+                            <h3 class="result-title">Creating Sacred Spaces</h3>
+                            <p class="result-description">Transform your environment into a sanctuary of peace. This guide explores the principles of creating harmonious spaces that support contemplation and inner growth.</p>
+                            <div class="result-meta">
+                                <span>from Zen Living Magazine</span>
+                                <span class="result-relevance">88% match</span>
+                            </div>
+                        </div>
+                        
+                        <div class="result-item">
+                            <h3 class="result-title">Breathing Techniques for Daily Practice</h3>
+                            <p class="result-description">Master the fundamental breathing techniques that form the foundation of mindful living. Simple yet profound practices that can be integrated into any daily routine.</p>
+                            <div class="result-meta">
+                                <span>by Dr. Sarah Chen</span>
+                                <span class="result-relevance">92% match</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sidebar">
+                    <div class="recent-searches">
+                        <h3 class="section-title">Recent Searches</h3>
+                        <div class="recent-item" data-search="meditation techniques">
+                            <span>meditation techniques</span>
+                            <span class="recent-time">2 min ago</span>
+                        </div>
+                        <div class="recent-item" data-search="zen gardens">
+                            <span>zen gardens</span>
+                            <span class="recent-time">1 hour ago</span>
+                        </div>
+                        <div class="recent-item" data-search="mindfulness books">
+                            <span>mindfulness books</span>
+                            <span class="recent-time">Yesterday</span>
+                        </div>
+                        <div class="recent-item" data-search="breathing exercises">
+                            <span>breathing exercises</span>
+                            <span class="recent-time">2 days ago</span>
+                        </div>
+                        <div class="recent-item" data-search="inner peace">
+                            <span>inner peace</span>
+                            <span class="recent-time">3 days ago</span>
+                        </div>
+                    </div>
+
+                    <div class="filters-panel">
+                        <h3 class="section-title">Refine Your Search</h3>
+                        <div class="filter-group">
+                            <label class="filter-label">Content Type</label>
+                            <select class="filter-select" id="contentType">
+                                <option value="">All Content</option>
+                                <option value="articles">Articles</option>
+                                <option value="books">Books</option>
+                                <option value="videos">Videos</option>
+                                <option value="podcasts">Podcasts</option>
+                            </select>
+                        </div>
+                        
+                        <div class="filter-group">
+                            <label class="filter-label">Time Frame</label>
+                            <select class="filter-select" id="timeFrame">
+                                <option value="">Any Time</option>
+                                <option value="day">Past Day</option>
+                                <option value="week">Past Week</option>
+                                <option value="month">Past Month</option>
+                                <option value="year">Past Year</option>
+                            </select>
+                        </div>
+                        
+                        <div class="filter-group">
+                            <label class="filter-label">Difficulty Level</label>
+                            <div class="filter-tags">
+                                <span class="filter-tag" data-filter="beginner">Beginner</span>
+                                <span class="filter-tag" data-filter="intermediate">Intermediate</span>
+                                <span class="filter-tag" data-filter="advanced">Advanced</span>
+                            </div>
+                        </div>
+                        
+                        <div class="filter-group">
+                            <label class="filter-label">Practice Focus</label>
+                            <div class="filter-tags">
+                                <span class="filter-tag" data-filter="meditation">Meditation</span>
+                                <span class="filter-tag" data-filter="philosophy">Philosophy</span>
+                                <span class="filter-tag" data-filter="lifestyle">Lifestyle</span>
+                                <span class="filter-tag" data-filter="healing">Healing</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="analytics-panel">
+                        <h3 class="section-title">Search Insights</h3>
+                        <div class="analytics-metric">
+                            <span class="metric-label">Total Searches</span>
+                            <span class="metric-value">47</span>
+                        </div>
+                        <div class="analytics-metric">
+                            <span class="metric-label">Avg. Session</span>
+                            <span class="metric-value">12 min</span>
+                        </div>
+                        <div class="analytics-metric">
+                            <span class="metric-label">Top Category</span>
+                            <span class="metric-value">Meditation</span>
+                        </div>
+                        <div class="analytics-metric">
+                            <span class="metric-label">Focus Score</span>
+                            <span class="metric-value">85%</span>
+                        </div>
+                        <div class="analytics-metric">
+                            <span class="metric-label">Mindful Searches</span>
+                            <span class="metric-value">23 today</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Search functionality with mindful interactions
+        const searchInput = document.getElementById('searchInput');
+        const autocompleteDropdown = document.getElementById('autocompleteDropdown');
+        const loadingState = document.getElementById('loadingState');
+        const resultsContainer = document.getElementById('resultsContainer');
+        
+        // Autocomplete functionality
+        searchInput.addEventListener('input', function() {
+            const query = this.value.toLowerCase();
+            if (query.length > 0) {
+                showAutocomplete();
+                filterAutocompleteItems(query);
+            } else {
+                hideAutocomplete();
+            }
+        });
+
+        searchInput.addEventListener('focus', function() {
+            if (this.value.length > 0) {
+                showAutocomplete();
+            }
+        });
+
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.search-section')) {
+                hideAutocomplete();
+            }
+        });
+
+        function showAutocomplete() {
+            autocompleteDropdown.classList.add('show');
+        }
+
+        function hideAutocomplete() {
+            autocompleteDropdown.classList.remove('show');
+        }
+
+        function filterAutocompleteItems(query) {
+            const items = autocompleteDropdown.querySelectorAll('.autocomplete-item');
+            items.forEach(item => {
+                const text = item.textContent.toLowerCase();
+                if (text.includes(query)) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        // Autocomplete item selection
+        autocompleteDropdown.addEventListener('click', function(e) {
+            const item = e.target.closest('.autocomplete-item');
+            if (item) {
+                const value = item.dataset.value;
+                searchInput.value = value;
+                hideAutocomplete();
+                performSearch(value);
+            }
+        });
+
+        // Recent searches functionality
+        document.querySelectorAll('.recent-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const searchTerm = this.dataset.search;
+                searchInput.value = searchTerm;
+                performSearch(searchTerm);
+            });
+        });
+
+        // Filter functionality
+        const filterTags = document.querySelectorAll('.filter-tag');
+        filterTags.forEach(tag => {
+            tag.addEventListener('click', function() {
+                this.classList.toggle('active');
+                applyFilters();
+            });
+        });
+
+        document.getElementById('contentType').addEventListener('change', applyFilters);
+        document.getElementById('timeFrame').addEventListener('change', applyFilters);
+
+        function applyFilters() {
+            // Simulate filter application with gentle transition
+            showLoading();
+            setTimeout(() => {
+                hideLoading();
+                updateResults();
+            }, 1000);
+        }
+
+        function performSearch(query) {
+            showLoading();
+            
+            // Simulate search with mindful timing
+            setTimeout(() => {
+                hideLoading();
+                updateResults(query);
+                updateAnalytics(query);
+            }, 1500);
+        }
+
+        function showLoading() {
+            loadingState.classList.add('show');
+            resultsContainer.style.opacity = '0.3';
+        }
+
+        function hideLoading() {
+            loadingState.classList.remove('show');
+            resultsContainer.style.opacity = '1';
+        }
+
+        function updateResults(query = '') {
+            // Simulate dynamic result updates
+            const results = [
+                {
+                    title: `Mindful Approach to ${query || 'Inner Peace'}`,
+                    description: `Explore the gentle path to understanding ${query || 'inner peace'} through mindful practice and contemplation. Discover how ancient wisdom applies to modern life.`,
+                    author: 'Master Eckhart Tolle',
+                    relevance: Math.floor(Math.random() * 15) + 85
+                },
+                {
+                    title: `The Way of ${query || 'Zen'} Practice`,
+                    description: `A comprehensive guide to integrating ${query || 'zen principles'} into daily life. Learn from masters who have walked this path for decades.`,
+                    author: 'Suzuki Roshi',
+                    relevance: Math.floor(Math.random() * 15) + 80
+                },
+                {
+                    title: `Daily Rituals for ${query || 'Mindfulness'}`,
+                    description: `Simple yet profound practices that cultivate ${query || 'mindfulness'} throughout your day. Transform ordinary moments into opportunities for growth.`,
+                    author: 'Jon Kabat-Zinn',
+                    relevance: Math.floor(Math.random() * 15) + 87
+                }
+            ];
+
+            resultsContainer.innerHTML = results.map(result => `
+                <div class="result-item">
+                    <h3 class="result-title">${result.title}</h3>
+                    <p class="result-description">${result.description}</p>
+                    <div class="result-meta">
+                        <span>by ${result.author}</span>
+                        <span class="result-relevance">${result.relevance}% match</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateAnalytics(query) {
+            // Simulate analytics updates
+            const metrics = document.querySelectorAll('.metric-value');
+            metrics[0].textContent = parseInt(metrics[0].textContent) + 1; // Total searches
+            
+            // Update mindful searches counter
+            const mindfulSearches = metrics[4];
+            mindfulSearches.textContent = (parseInt(mindfulSearches.textContent.split(' ')[0]) + 1) + ' today';
+        }
+
+        // Breathing animation trigger on scroll
+        let ticking = false;
+        
+        function updateBreathingAnimation() {
+            const scrolled = window.pageYOffset;
+            const elements = document.querySelectorAll('.breathing-animation');
+            
+            elements.forEach(element => {
+                const rate = scrolled * -0.5;
+                element.style.transform = `translateY(${rate}px)`;
+            });
+            
+            ticking = false;
+        }
+
+        window.addEventListener('scroll', function() {
+            if (!ticking) {
+                requestAnimationFrame(updateBreathingAnimation);
+                ticking = true;
+            }
+        });
+
+        // Keyboard navigation for accessibility
+        searchInput.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                const firstItem = autocompleteDropdown.querySelector('.autocomplete-item:not([style*="display: none"])');
+                if (firstItem) firstItem.focus();
+            }
+        });
+
+        // Gentle hover effects for all interactive elements
+        document.querySelectorAll('.result-item, .recent-item, .filter-tag').forEach(element => {
+            element.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-2px)';
+            });
+            
+            element.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+
+        // Initialize with gentle entrance animation
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                document.body.style.opacity = '1';
+            }, 100);
+        });
+
+        // Mindful search on Enter key
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                performSearch(this.value);
+                hideAutocomplete();
+            }
+        });
+    </script>
+</body>
+</html>
