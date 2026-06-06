@@ -1,0 +1,33 @@
+spec_version: "0.1.0"
+name: infinite-agentic-loop
+version: 1.0.0
+description: >
+  Orchestrates multiple AI sub-agents in parallel to generate evolving, unique iterations
+  of content (UI components, documents, code) from a specification file. Supports single,
+  batch (5–20), and infinite (continuous wave) generation modes via a Claude Code slash
+  command (/project:infinite). Uses a four-phase pipeline: spec analysis, directory
+  reconnaissance, parallel agent coordination, and wave-based infinite orchestration.
+author: disler
+license: MIT
+
+model:
+  preferred: anthropic:claude-sonnet-4-6
+  constraints:
+    temperature: 0.7
+
+skills:
+  - infinite-loop-orchestration
+  - parallel-agent-coordination
+  - spec-driven-generation
+
+runtime:
+  max_turns: 200
+  timeout: 3600
+
+compliance:
+  risk_tier: standard
+  supervision:
+    human_in_the_loop: none
+    kill_switch: true
+  data_governance:
+    pii_handling: none
